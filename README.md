@@ -44,7 +44,7 @@ A Python, Qt library that showcases playing of Audio wave and visualizing of Aud
 
     . **FixedLiveAudioWaveForm(AudioWaveForm)**
 
-4. [*audiolivewaveform.py*](audiowave\audiolivewaveform.py)
+4. [*audiolivewaveform.py*](audiowave/audiolivewaveform.py)
 
     . **TimedLiveAudioWaveForm(TimedLiveAudioWave)**
     
@@ -55,9 +55,9 @@ A Python, Qt library that showcases playing of Audio wave and visualizing of Aud
     . **PlayingFixedAudioWaveForm(TimedLiveAudioWaveForm, FixedLiveAudioWaveForm)**
 
 ## Example
-run the [audiowave_examples.py](tests\audiowave_examples.py) and check out the possibilities.
+run the [audiowave_examples.py](tests/audiowave_examples.py) and check out the possibilities.
 
-![audiowave_examples.png](tests\test.PNG)
+![audiowave_examples.png](tests/test.PNG)
 
 
 ## DOCUMENTATION OF THE LIBRARY IS UPCOMING.
