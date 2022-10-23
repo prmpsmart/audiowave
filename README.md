@@ -5,7 +5,7 @@ A Python, Qt library that showcases playing of Audio wave and visualizing of Aud
 
 ## Classes
 
-1. *audiowave.py*
+1. [*audiowave.py*](audiowave/audiowave.py)
 
     . **AudioWave** - splitting audio wave data into array of integers and into each channels
 
@@ -13,7 +13,8 @@ A Python, Qt library that showcases playing of Audio wave and visualizing of Aud
     
     . **AudioWaveChannel** - scaling and sampling of a channel of the audio wave data
 
-2. audiowavelive.py
+2. [*audiowavelive.py*](audiowave/audiowavelive.py)
+
     . **LiveAudioWave** - base class for recording and playiing of audiowave data.
 
     . **AudioWaveRecorder(LiveAudioWave)**
@@ -27,7 +28,7 @@ A Python, Qt library that showcases playing of Audio wave and visualizing of Aud
     . **TimedLiveAudioWaveRecorder(TimedLiveAudioWave)**
 
 
-3. audiowaveform.py
+3. [*audiowaveform.py*](audiowave/audiowaveform.py)
 
     . **AudioWaveFormGravity(enum.Enum)**
 
@@ -43,7 +44,7 @@ A Python, Qt library that showcases playing of Audio wave and visualizing of Aud
 
     . **FixedLiveAudioWaveForm(AudioWaveForm)**
 
-4. audiolivewaveform.py
+4. [*audiolivewaveform.py*](audiowave\audiolivewaveform.py)
 
     . **TimedLiveAudioWaveForm(TimedLiveAudioWave)**
     
