@@ -1,0 +1,9 @@
+{
+    "python.pythonPath": "C:\\Python\\Python39\\python.exe",
+    "python.analysis.extraPaths": [
+        "./audiowave",
+        "./py_audiowave",
+        "./mimi_wave_ui/mimi_wave",
+        "../prmp_qt",
+    ],
+}
