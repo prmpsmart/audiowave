@@ -7,52 +7,52 @@ A Python, Qt library that showcases playing of Audio wave and visualizing of Aud
 
 1. [*audiowave.py*](audiowave/audiowave.py)
 
-    . **AudioWave** - splitting audio wave data into array of integers and into each channels
+    - **AudioWave** - splitting audio wave data into array of integers and into each channels
 
-    . **SamplingMethod(enum.Enum)**
+    - **SamplingMethod(enum.Enum)**
     
-    . **AudioWaveChannel** - scaling and sampling of a channel of the audio wave data
+    - **AudioWaveChannel** - scaling and sampling of a channel of the audio wave data
 
 2. [*audiowavelive.py*](audiowave/audiowavelive.py)
 
-    . **LiveAudioWave** - base class for recording and playiing of audiowave data.
+    - **LiveAudioWave** - base class for recording and playiing of audiowave data.
 
-    . **AudioWaveRecorder(LiveAudioWave)**
+    - **AudioWaveRecorder(LiveAudioWave)**
 
-    . **AudioWavePlayer(LiveAudioWave)**
+    - **AudioWavePlayer(LiveAudioWave)**
 
-    . **TimedLiveAudioWave** - recoring or playing of audiowave data and emitting a signal with the ongoing seconds of operation.
+    - **TimedLiveAudioWave** - recoring or playing of audiowave data and emitting a signal with the ongoing seconds of operation.
 
-    . **TimedLiveAudioWavePlayer(TimedLiveAudioWave)**
+    - **TimedLiveAudioWavePlayer(TimedLiveAudioWave)**
 
-    . **TimedLiveAudioWaveRecorder(TimedLiveAudioWave)**
+    - **TimedLiveAudioWaveRecorder(TimedLiveAudioWave)**
 
 
 3. [*audiowaveform.py*](audiowave/audiowaveform.py)
 
-    . **AudioWaveFormGravity(enum.Enum)**
+    - **AudioWaveFormGravity(enum.Enum)**
 
-    . **AudioWaveFormOptions** - the ui properties of the painted waveforms for each channel
+    - **AudioWaveFormOptions** - the ui properties of the painted waveforms for each channel
 
-    . **AudioWaveFormChannel(AudioWaveChannel)** - channel data holder for the waveform painting.
+    - **AudioWaveFormChannel(AudioWaveChannel)** - channel data holder for the waveform painting.
 
-    . **AudioWaveForm(QFrame)**
+    - **AudioWaveForm(QFrame)**
 
-    . **LiveAudioWaveFormChannel(AudioWaveChannel, QObject)** - channel data holder for the live waveform painting.
+    - **LiveAudioWaveFormChannel(AudioWaveChannel, QObject)** - channel data holder for the live waveform painting.
 
-    . **LiveAudioWaveForm(AudioWaveForm)** - waveforms being updated at the data increases
+    - **LiveAudioWaveForm(AudioWaveForm)** - waveforms being updated at the data increases
 
-    . **FixedLiveAudioWaveForm(AudioWaveForm)**
+    - **FixedLiveAudioWaveForm(AudioWaveForm)**
 
 4. [*audiolivewaveform.py*](audiowave/audiolivewaveform.py)
 
-    . **TimedLiveAudioWaveForm(TimedLiveAudioWave)**
+    - **TimedLiveAudioWaveForm(TimedLiveAudioWave)**
     
-    . **PlayingAudioWaveForm(LiveAudioWaveForm, TimedLiveAudioWaveForm)**
+    - **PlayingAudioWaveForm(LiveAudioWaveForm, TimedLiveAudioWaveForm)**
     
-    . **RecordingAudioWaveForm(TimedLiveAudioWaveForm, LiveAudioWaveForm)**
+    - **RecordingAudioWaveForm(TimedLiveAudioWaveForm, LiveAudioWaveForm)**
     
-    . **PlayingFixedAudioWaveForm(TimedLiveAudioWaveForm, FixedLiveAudioWaveForm)**
+    - **PlayingFixedAudioWaveForm(TimedLiveAudioWaveForm, FixedLiveAudioWaveForm)**
 
 ## Example
 run the [audiowave_examples.py](tests/audiowave_examples.py) and check out the possibilities.
