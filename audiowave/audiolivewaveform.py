@@ -29,7 +29,7 @@ class TimedLiveAudioWaveForm(TimedLiveAudioWave):
         ...
 
 
-class PlayingAudioWaveForm(LiveAudioWaveForm, TimedLiveAudioWaveForm):
+class PlayingAudioWaveForm(TimedLiveAudioWaveForm, LiveAudioWaveForm):
     def __init__(self, **kwargs) -> None:
         LiveAudioWaveForm.__init__(self, **kwargs)
         TimedLiveAudioWaveForm.__init__(self, False)
@@ -39,8 +39,6 @@ class RecordingAudioWaveForm(TimedLiveAudioWaveForm, LiveAudioWaveForm):
     def __init__(self, **kwargs) -> None:
         LiveAudioWaveForm.__init__(self, **kwargs)
         TimedLiveAudioWaveForm.__init__(self, True)
-
-
 
 
 class PlayingFixedAudioWaveForm(TimedLiveAudioWaveForm, FixedLiveAudioWaveForm):

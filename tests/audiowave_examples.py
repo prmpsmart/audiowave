@@ -12,8 +12,8 @@ class Button(IconTextButton):
         super().__init__(
             icon=r"C:\Users\Administrator\Desktop\GITHUB_PROJECTS\Amebo\desktop\ui\utils\resources\%s.svg"
             % icon,
-            icon_size=30,
-            togglable=1,
+            iconSize=30,
+            checkable=1,
             iconColor="white",
         )
         self.clicked.connect(func)
@@ -34,7 +34,7 @@ class LiveFrame(TimedLiveAudioWave, VFrame):
 
         lay.addWidget(LeftAlignLabel(text=self.__class__.__name__ + " :"))
 
-        self.time_label = AlignLabel(text="00:00:00", name="time_label")
+        self.time_label = AlignLabel(text="00:00:00", objectName="time_label")
         lay.addWidget(self.time_label)
 
         self.but_lay = QHBoxLayout()
