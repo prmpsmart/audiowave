@@ -1,4 +1,4 @@
-"""Player page: overview, waveform / spectrogram / scope, transport and takes."""
+"""Player page: overview, waveform / spectrogram / spectrum / scope / compare, edit tools, transport and takes."""
 
 from __future__ import annotations
 
@@ -12,19 +12,21 @@ from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLabel,
+    QMenu,
     QPushButton,
     QStackedWidget,
     QVBoxLayout,
     QWidget,
 )
 
-from audiowave import AudioClip, Loop, Marker
-from audiowave.audio import PlayerState
+from audiowave import AudioClip, Loop, Loudness, Marker
+from audiowave.audio import FILE_DIALOG_FILTER, PlayerState
 from audiowave.binding import bind_player
 from audiowave.core import to_db
 from audiowave.widgets import (
     OverviewView,
     SpectrogramView,
+    SpectrumView,
     VectorscopeView,
     Viewport,
     WaveformView,
@@ -33,10 +35,14 @@ from studio.session import Session
 from studio.theme import get_theme, icon
 from studio.widgets import Segmented, chip
 from studio.widgets.channel_strip import ChannelStrip
+from studio.widgets.compare_panel import ComparePanel, format_lufs
+from studio.widgets.edit_bar import EditBar
 from studio.widgets.takes_view import TakesView
 from studio.widgets.transport import TransportBar
 
 METER_WINDOW = 0.04  # seconds of audio behind the playhead that the meters look at
+SPECTRUM_WINDOW = 2048  # samples analysed by the spectrum view
+VIEWS = ("waveform", "spectrogram", "spectrum", "scope", "compare")
 
 
 def volume_curve(slider: float) -> float:
@@ -55,11 +61,12 @@ class PlayerPage(QWidget):
 
         col = QVBoxLayout(self)
         col.setContentsMargins(22, 16, 22, 18)
-        col.setSpacing(12)
+        col.setSpacing(10)
         col.addLayout(self._info_row())
+        col.addLayout(self._tools_row())
 
         self.overview = OverviewView(session.viewport)
-        self.overview.setFixedHeight(58)
+        self.overview.setFixedHeight(54)
         col.addWidget(self.overview)
         col.addLayout(self._views_row(), 1)
 
@@ -80,23 +87,43 @@ class PlayerPage(QWidget):
         row.setSpacing(8)
         self._chips = [chip() for _ in range(5)]
         self._peak_chip = chip(accent=True)
-        for c in (*self._chips, self._peak_chip):
+        self._lufs_chip = chip(accent=True)
+        self._lra_chip = chip()
+        self._momentary_chip = chip()
+        for c in (
+            *self._chips,
+            self._peak_chip,
+            self._lufs_chip,
+            self._lra_chip,
+            self._momentary_chip,
+        ):
             row.addWidget(c)
+        row.addStretch()
+        return row
+
+    def _tools_row(self) -> QHBoxLayout:
+        row = QHBoxLayout()
+        row.setSpacing(10)
+        self.edit_bar = EditBar()
+        row.addWidget(self.edit_bar)
         row.addStretch()
         self.view_switch = Segmented(
             [
                 ("waveform", "Waveform"),
                 ("spectrogram", "Spectrogram"),
+                ("spectrum", "Spectrum"),
                 ("scope", "Scope"),
+                ("compare", "Compare"),
             ]
         )
-        self.view_switch.setFixedWidth(270)
+        self.view_switch.setFixedWidth(440)
         row.addWidget(self.view_switch)
-        open_button = QPushButton("Open…")
-        open_button.setIcon(icon("folder", get_theme().text))
-        open_button.clicked.connect(self.open_dialog)
-        row.addWidget(open_button)
-        self._open_button = open_button
+        self._open_button = QPushButton("Open")
+        self._open_button.setIcon(icon("folder", get_theme().text))
+        self._open_menu = QMenu(self._open_button)
+        self._open_menu.aboutToShow.connect(self._fill_open_menu)
+        self._open_button.setMenu(self._open_menu)
+        row.addWidget(self._open_button)
         return row
 
     def _views_row(self) -> QHBoxLayout:
@@ -105,10 +132,12 @@ class PlayerPage(QWidget):
         vp: Viewport = self._s.viewport
         self.waveform = WaveformView(vp)
         self.spectrogram = SpectrogramView(vp)
+        self.spectrum = SpectrumView()
         self.scope = VectorscopeView()
+        self.compare = ComparePanel(self._s)
         self.strip = ChannelStrip(self.waveform.RULER_HEIGHT)
         self.stack = QStackedWidget()
-        for w in (self.waveform, self.spectrogram, self.scope):
+        for w in (self.waveform, self.spectrogram, self.spectrum, self.scope, self.compare):
             self.stack.addWidget(w)
         well = QFrame()
         well.setObjectName("well")
@@ -124,7 +153,7 @@ class PlayerPage(QWidget):
         row = QHBoxLayout()
         title = QLabel("Takes")
         title.setObjectName("h3")
-        hint = QLabel("Recordings land here. Click one to load it into the player.")
+        hint = QLabel("Recordings and opened files land here. Click one to load it.")
         hint.setObjectName("muted")
         self.save_button = QPushButton("Save WAV")
         self.export_button = QPushButton("Export PNG")
@@ -147,23 +176,25 @@ class PlayerPage(QWidget):
         player = s.player
 
         bind_player(
-            player,
-            self.waveform,
-            self.spectrogram,
-            self.overview,
-            sync_loop=False,
-            follow=False,
+            player, self.waveform, self.spectrogram, self.overview, sync_loop=False, follow=False
         )
         player.positionChanged.connect(self.scope.set_position)
+        player.positionChanged.connect(self.compare.set_position)
         player.positionChanged.connect(self._on_position)
         player.stateChanged.connect(self._on_state)
+        self.compare.seekRequested.connect(player.seek)
 
         s.clipChanged.connect(self._on_clip)
         s.loopChanged.connect(self._on_loop)
         s.loopEnabledChanged.connect(tr.loop.setChecked)
         s.markersChanged.connect(self._on_markers)
+        s.silencesChanged.connect(self._on_silences)
+        s.loudnessChanged.connect(self._on_loudness)
         s.appearance.changed.connect(self.apply_appearance)
         s.viewport.changed.connect(self._sync_zoom)
+        s.busyChanged.connect(lambda _: self._update_edit_state())
+        s.takes.clipChanged.connect(lambda *_: self._update_edit_state())
+        s.takes.currentChanged.connect(lambda _t: self._update_edit_state())
 
         for view in (self.waveform, self.spectrogram):
             view.loopChanged.connect(s.set_loop_region)
@@ -183,7 +214,35 @@ class PlayerPage(QWidget):
 
         self.strip.gainsChanged.connect(player.set_channel_gains)
         self.view_switch.currentChanged.connect(self._on_view)
+        self.edit_bar.action.connect(self._on_edit_action)
         self.apply_appearance()
+        self._update_edit_state()
+
+    # -- editing --------------------------------------------------------------------------------
+
+    def _on_edit_action(self, action: str, value: object) -> None:
+        s = self._s
+        if action == "undo":
+            s.undo()
+        elif action == "redo":
+            s.redo()
+        elif action == "find_silences":
+            s.find_silences()
+        elif action == "clear_silences":
+            s.clear_silences()
+        else:
+            s.run_edit(action, value)  # type: ignore[arg-type]
+
+    def _update_edit_state(self) -> None:
+        take = self._s.takes.current
+        selection = self._s.loop
+        self.edit_bar.set_state(
+            has_clip=take is not None,
+            has_selection=selection is not None and selection.length > 0.01,
+            can_undo=bool(take and take.undo),
+            can_redo=bool(take and take.redo),
+            busy=self._s.busy,
+        )
 
     # -- state -> view --------------------------------------------------------------------------
 
@@ -193,8 +252,10 @@ class PlayerPage(QWidget):
         self.waveform.set_appearance(m.appearance(1), 1)
         self.waveform.set_auto_gain(m.auto_gain)
         self.overview.set_appearance(m.appearance(0))
-        self.spectrogram.set_theme(m.appearance(0).palette)
-        self.scope.set_theme(m.appearance(0).palette)
+        palette = m.appearance(0).palette
+        for view in (self.spectrogram, self.spectrum, self.scope):
+            view.set_theme(palette)
+        self.compare.apply_appearance()
         self.strip.apply_theme()
 
     def _on_clip(self, clip: AudioClip | None) -> None:
@@ -202,9 +263,12 @@ class PlayerPage(QWidget):
         self.waveform.set_clip(clip)
         self.overview.set_clip(clip, self.waveform.clip_peaks)
         self.scope.set_clip(clip)
+        self.spectrum.clear()
         self._spectrogram_stale = True
         if self.stack.currentWidget() is self.spectrogram:
             self._ensure_spectrogram()
+        if self.stack.currentWidget() is self.compare:
+            self.compare.refresh()
         self.strip.set_channels(clip.channels if clip else 0)
         self.strip.reset_levels()
         self._fill_info(clip)
@@ -212,10 +276,17 @@ class PlayerPage(QWidget):
         for w in (self.transport, self.save_button, self.export_button):
             w.setEnabled(clip is not None)
         self._sync_zoom()
+        self._update_edit_state()
 
     def _fill_info(self, clip: AudioClip | None) -> None:
         if clip is None:
-            for c in (*self._chips, self._peak_chip):
+            for c in (
+                *self._chips,
+                self._peak_chip,
+                self._lufs_chip,
+                self._lra_chip,
+                self._momentary_chip,
+            ):
                 c.setText("")
             return
         size_mb = clip.frames * clip.channels * 2 / 1_000_000
@@ -232,16 +303,44 @@ class PlayerPage(QWidget):
             strict=True,
         ):
             c.setText(text)
-        self._peak_chip.setText(f"peak {to_db(clip.peak()):.1f} dBFS")
+        self._peak_chip.setText(f"peak {to_db(clip.peak()):.1f} dBFS".replace("-", "−"))
+        self._lufs_chip.setText("measuring loudness…")
+        self._lra_chip.setText("")
+        self._momentary_chip.setText("")
+
+    def _on_loudness(self, loudness: Loudness | None) -> None:
+        if loudness is None:
+            return
+        self._lufs_chip.setText(format_lufs(loudness.integrated))
+        self._lra_chip.setText(
+            f"LRA {loudness.range:.1f} LU" if math.isfinite(loudness.integrated) else ""
+        )
+        self._update_momentary(self._s.player.position)
+
+    def _update_momentary(self, seconds: float) -> None:
+        loudness = self._s.loudness
+        if loudness is None:
+            return
+        value = loudness.momentary_at(seconds)
+        self._momentary_chip.setText(
+            f"M {value:.1f}".replace("-", "−") if math.isfinite(value) else "M −∞"
+        )
 
     def _on_position(self, seconds: float) -> None:
         self.transport.set_time(seconds, self._s.player.duration)
         self.overview.set_position(seconds)
+        self._update_momentary(seconds)
         clip = self._clip
-        if clip is not None and self._s.player.state is PlayerState.PLAYING:
-            end = int(seconds * clip.sample_rate)
+        if clip is None:
+            return
+        end = int(seconds * clip.sample_rate)
+        playing = self._s.player.state is PlayerState.PLAYING
+        if playing:
             window = clip.samples[:, max(end - int(METER_WINDOW * clip.sample_rate), 0) : end]
             self.strip.set_levels([float(np.abs(c).max()) if c.size else 0.0 for c in window])
+        if self.stack.currentWidget() is self.spectrum:
+            mono = clip.samples[:, max(end - SPECTRUM_WINDOW, 0) : end].mean(axis=0)
+            self.spectrum.feed(mono, clip.sample_rate)
 
     def _on_state(self, state: PlayerState) -> None:
         self.transport.set_playing(state is PlayerState.PLAYING)
@@ -257,16 +356,30 @@ class PlayerPage(QWidget):
     def _on_loop(self, loop: Loop | None) -> None:
         for view in (self.waveform, self.spectrogram, self.overview):
             view.set_loop(loop)
+        self._update_edit_state()
 
     def _on_markers(self, markers: list[Marker]) -> None:
         self.waveform.set_markers(markers)
         self.spectrogram.set_markers(markers)
 
+    def _on_silences(self, silences: list[Loop]) -> None:
+        self.waveform.set_highlights(silences)
+        self.spectrogram.set_highlights(silences)
+
     def _on_view(self, key: str) -> None:
-        self.stack.setCurrentIndex({"waveform": 0, "spectrogram": 1, "scope": 2}[key])
+        leaving_compare = self.stack.currentWidget() is self.compare and key != "compare"
+        if leaving_compare:
+            self.compare.restore_a()
+            self._s.viewport.set_duration(self._clip.duration if self._clip else 0.0)
+        self.stack.setCurrentIndex(VIEWS.index(key))
         self.strip.setVisible(key == "waveform")
+        self.overview.setVisible(key != "compare")
         if key == "spectrogram":
             self._ensure_spectrogram()
+        elif key == "compare":
+            self.compare.refresh()
+        elif key == "spectrum":
+            self._on_position(self._s.player.position)
 
     def _ensure_spectrogram(self) -> None:
         """Analyse lazily: the FFT is only paid for if the user looks at it."""
@@ -298,8 +411,21 @@ class PlayerPage(QWidget):
 
     # -- file actions ---------------------------------------------------------------------------
 
+    def _fill_open_menu(self) -> None:
+        menu = self._open_menu
+        menu.clear()
+        menu.addAction("Browse…", self.open_dialog)
+        recent = self._s.recent
+        paths = recent.paths() if recent is not None else []
+        if paths:
+            menu.addSeparator()
+            for path in paths:
+                menu.addAction(path.name, lambda p=path: self._s.open_file(p)).setToolTip(str(path))
+            menu.addSeparator()
+            menu.addAction("Clear recent", recent.clear)  # type: ignore[union-attr]
+
     def open_dialog(self) -> None:
-        path, _ = QFileDialog.getOpenFileName(self, "Open audio", "", "WAV audio (*.wav)")
+        path, _ = QFileDialog.getOpenFileName(self, "Open audio", "", FILE_DIALOG_FILTER)
         if path:
             self._s.open_file(path)
 
@@ -323,4 +449,5 @@ class PlayerPage(QWidget):
 
     def refresh_theme(self) -> None:
         self.transport.refresh_icons()
+        self.edit_bar.refresh_icons()
         self._open_button.setIcon(icon("folder", get_theme().text))

@@ -14,7 +14,7 @@ from audiowave.audio import PlayerState
 
 @pytest.fixture
 def window(qtbot, tmp_path):
-    w = build_window(presets_path=tmp_path / "presets.json")
+    w = build_window(presets_path=tmp_path / "presets.json", settings_path=tmp_path / "s.ini")
     qtbot.addWidget(w)
     w.resize(1440, 900)
     w.show()

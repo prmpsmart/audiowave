@@ -204,3 +204,74 @@ def test_spectrogram_and_vectorscope_render(qtbot, sine, stereo):
     vs.set_position(1.0)
     assert vs.correlation() == pytest.approx(0.0, abs=1.0)  # ramp vs silence: a valid finite value
     assert dark_ratio(vs) > 0.01
+
+
+# -- keyboard, highlights, spectrum ---------------------------------------------------------------
+
+
+def test_keyboard_navigation_requests_seeks_and_zoom(view, qtbot):
+    view.set_position(1.0)
+    cases = [
+        (Qt.Key.Key_Right, Qt.KeyboardModifier.NoModifier, 2.0),
+        (Qt.Key.Key_Left, Qt.KeyboardModifier.NoModifier, 0.0),
+        (Qt.Key.Key_Right, Qt.KeyboardModifier.ShiftModifier, 2.0),  # clamped to the 2 s clip
+        (Qt.Key.Key_Right, Qt.KeyboardModifier.AltModifier, 1.1),
+        (Qt.Key.Key_Home, Qt.KeyboardModifier.NoModifier, 0.0),
+        (Qt.Key.Key_End, Qt.KeyboardModifier.NoModifier, 2.0),
+    ]
+    for key, mods, expected in cases:
+        with qtbot.waitSignal(view.seekRequested, timeout=500) as sig:
+            QTest.keyClick(view, key, mods)
+        assert sig.args[0] == pytest.approx(expected), (key, mods)
+
+    QTest.keyClick(view, Qt.Key.Key_Plus)
+    assert view.viewport.zoom_level > 1.4
+    QTest.keyClick(view, Qt.Key.Key_0)
+    assert view.viewport.is_full
+    view.viewport.set_range(0.0, 0.5)
+    QTest.keyClick(view, Qt.Key.Key_PageDown)
+    assert view.viewport.start == pytest.approx(0.5)
+
+
+def test_highlights_are_drawn_and_do_not_intercept_the_mouse(view, qtbot):
+    before = dark_ratio(view)
+    view.set_highlights([Loop(0.2, 0.6), Loop(1.2, 1.5)])
+    assert len(view.highlights) == 2 and dark_ratio(view) > before
+    with qtbot.waitSignal(view.seekRequested, timeout=500):
+        QTest.mouseClick(view, Qt.MouseButton.LeftButton, pos=QPoint(int(view.time_to_x(0.4)), 120))
+    view.set_highlights([])
+    assert view.highlights == []
+
+
+def test_set_clip_can_leave_a_shared_viewport_alone(qtbot, sine, stereo):
+    from audiowave.widgets import Viewport
+
+    vp = Viewport()
+    a, b = WaveformView(vp), WaveformView(vp)
+    for w in (a, b):
+        qtbot.addWidget(w)
+    vp.set_duration(5.0)
+    a.set_clip(sine, reset_viewport=False)
+    b.set_clip(stereo, reset_viewport=False)
+    assert vp.duration == 5.0 and a.clip is sine and b.clip is stereo
+
+
+def test_spectrum_view_shows_the_tone_and_decays(qtbot):
+    from audiowave.widgets import SpectrumView
+
+    v = SpectrumView()
+    qtbot.addWidget(v)
+    v.resize(400, 160)
+    rate = 44100
+    t = np.arange(4096) / rate
+    v.feed(0.5 * np.sin(2 * np.pi * 1000 * t), rate)
+    peak_band = int(v.levels.argmax())
+    assert abs(v.centres[peak_band] - 1000) / 1000 < 0.12 and v.levels.max() == pytest.approx(
+        -6, abs=2.5
+    )
+    assert dark_ratio(v) > 0.02
+    qtbot.wait(400)  # released at 45 dB/s
+    assert v.levels.max() < -15
+    v.clear()
+    assert (v.levels <= -90).all()
+    v.feed(np.zeros(0, np.float32), rate)  # empty input is ignored

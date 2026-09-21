@@ -80,6 +80,41 @@ def spectrogram(
     return Spectrogram(db.T, sample_rate, n_fft, hop)
 
 
+# -- spectrum analyser ----------------------------------------------------------------------------
+
+
+def band_levels(
+    samples: np.ndarray,
+    sample_rate: int,
+    bands: int = 48,
+    n_fft: int = 2048,
+    f_min: float = 30.0,
+    f_max: float = 16000.0,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Levels (dBFS) of ``bands`` log-spaced frequency bands from the last ``n_fft`` samples.
+
+    Returns ``(centre_frequencies_hz, levels_db)``. A full-scale sine reads about 0 dB in its band.
+    """
+    x = np.asarray(samples, np.float32)[-n_fft:]
+    if len(x) < n_fft:
+        x = np.pad(x, (n_fft - len(x), 0))
+    window = np.hanning(n_fft).astype(np.float32)
+    magnitude = np.abs(np.fft.rfft(x * window)) * (2.0 / window.sum())
+    freqs = np.fft.rfftfreq(n_fft, 1.0 / sample_rate)
+
+    f_max = min(f_max, sample_rate / 2 * 0.98)
+    edges = np.geomspace(f_min, f_max, bands + 1)
+    centres = np.sqrt(edges[:-1] * edges[1:])
+    levels = np.empty(bands)
+    for i in range(bands):
+        in_band = (freqs >= edges[i]) & (freqs < edges[i + 1])
+        if in_band.any():
+            levels[i] = magnitude[in_band].max()
+        else:  # a band narrower than one FFT bin: use the nearest bin instead of reading silence
+            levels[i] = magnitude[int(np.argmin(np.abs(freqs - centres[i])))]
+    return centres, np.asarray(to_db(levels), np.float64)
+
+
 # -- stereo image ---------------------------------------------------------------------------------
 
 

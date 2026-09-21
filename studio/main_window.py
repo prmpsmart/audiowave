@@ -17,7 +17,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from audiowave.audio import PlayerState, RecorderState, input_devices, output_devices
+from audiowave.audio import RecorderState, input_devices, is_supported, output_devices
 from studio.inspector import Inspector
 from studio.models import Take
 from studio.pages.lab_page import LabPage
@@ -158,6 +158,7 @@ class MainWindow(QMainWindow):
         s.message.connect(self.show_message)
         s.takes.currentChanged.connect(self._on_take)
         s.takes.renamed.connect(lambda _t: self._on_take(s.takes.current))
+        s.takes.clipChanged.connect(lambda *_: self._on_take(s.takes.current))
 
     def _shortcuts(self) -> None:
         def bind(key: str, handler) -> None:
@@ -176,6 +177,12 @@ class MainWindow(QMainWindow):
         )
         bind("R", lambda: self._on_page("record", self.record_page.toggle_recording))
         bind("Ctrl+O", lambda: self._on_page("player", self.player_page.open_dialog))
+        bind("Ctrl+Z", lambda: self._on_page("player", self._s.undo))
+        bind("Ctrl+Shift+Z", lambda: self._on_page("player", self._s.redo))
+        bind("Ctrl+Y", lambda: self._on_page("player", self._s.redo))
+        bind("Delete", lambda: self._on_page("player", lambda: self._s.run_edit("cut")))
+        bind("Backspace", lambda: self._on_page("player", lambda: self._s.run_edit("cut")))
+        bind("Ctrl+T", lambda: self._on_page("player", lambda: self._s.run_edit("trim")))
 
     def _on_page(self, page: str, action) -> None:
         if PAGES[self.stack.currentIndex()] == page:
@@ -207,8 +214,8 @@ class MainWindow(QMainWindow):
         if take is None:
             self._file.setText("")
             return
-        saved = "saved" if take.path else "unsaved"
-        self._file.setText(f"{take.name}{'.wav' if take.path else ''}  ·  {saved}")
+        state = "edited" if take.dirty else "saved" if take.path else "unsaved"
+        self._file.setText(f"{take.path.name if take.path else take.name}  ·  {state}")
 
     # -- devices --------------------------------------------------------------------------------
 
@@ -263,12 +270,12 @@ class MainWindow(QMainWindow):
     # -- drag & drop ----------------------------------------------------------------------------
 
     def dragEnterEvent(self, event: QDragEnterEvent) -> None:
-        if any(u.toLocalFile().lower().endswith(".wav") for u in event.mimeData().urls()):
+        if any(is_supported(u.toLocalFile()) for u in event.mimeData().urls()):
             event.acceptProposedAction()
 
     def dropEvent(self, event: QDropEvent) -> None:
         for url in event.mimeData().urls():
-            if url.toLocalFile().lower().endswith(".wav"):
+            if is_supported(url.toLocalFile()):
                 self._s.open_file(url.toLocalFile())
                 self.show_page("player")
 
@@ -276,9 +283,10 @@ class MainWindow(QMainWindow):
         if self._s.recorder.state is not RecorderState.STOPPED:
             self._s.recorder.stop()
         self._s.player.stop()
+        self._s.shutdown()
         self.stream_page.sender.stop()
         self.stream_page.receiver.disconnect_from()
         super().closeEvent(event)
 
 
-__all__ = ["PAGES", "MainWindow", "PlayerState"]
+__all__ = ["PAGES", "MainWindow"]

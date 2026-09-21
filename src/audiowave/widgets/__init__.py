@@ -12,6 +12,7 @@ from .painters import (
     register,
 )
 from .spectrogram_view import SpectrogramView
+from .spectrum_view import SpectrumView
 from .timeline import TimelineView
 from .vectorscope_view import VectorscopeView
 from .viewport import Viewport
@@ -24,6 +25,7 @@ __all__ = [
     "OverviewView",
     "PaintJob",
     "SpectrogramView",
+    "SpectrumView",
     "TimelineView",
     "VectorscopeView",
     "Viewport",

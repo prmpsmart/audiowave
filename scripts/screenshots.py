@@ -25,7 +25,8 @@ SIZE = (1440, 900)
 def main() -> int:
     QCoreApplication.setApplicationName("AudioWaveScreenshots")
     app = QApplication(sys.argv)
-    window = build_window(presets_path=Path(tempfile.mkdtemp()) / "presets.json")
+    tmp = Path(tempfile.mkdtemp())
+    window = build_window(presets_path=tmp / "presets.json", settings_path=tmp / "settings.ini")
     window.resize(*SIZE)
     window.show()
 

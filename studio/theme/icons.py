@@ -48,6 +48,19 @@ _ICONS: dict[str, tuple[str, bool]] = {
     "chev": ("M6 9l6 6 6-6", False),
     "check": ("M5 12l5 5 9-10", False),
     "wave": ("M3 12h2M7 8v8M11 4v16M15 7v10M19 10v4", False),
+    "scissors": (
+        "M6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM20 4L8.1 15.9M14.5 14.5L20 20M8.1 8.1L12 12",
+        False,
+    ),
+    "trim": ("M7 3v18M17 3v18M7 12h10M3 12h4M17 12h4", False),
+    "undo": ("M9 14L4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3", False),
+    "redo": ("M15 14l5-5-5-5M20 9H10a6 6 0 0 0 0 12h3", False),
+    "fadein": ("M3 20h18L3 4z", False),
+    "fadeout": ("M21 20H3L21 4z", False),
+    "mute": ("M4 9v6h4l5 4V5L8 9zM22 9l-6 6M16 9l6 6", False),
+    "level": ("M4 12h4l2-6 4 12 2-6h4", False),
+    "compare": ("M4 6h16M4 10h16M4 14h10M4 18h6", False),
+    "spectrum": ("M5 20V12M9 20V6M13 20V9M17 20V4M21 20V14", False),
 }
 
 

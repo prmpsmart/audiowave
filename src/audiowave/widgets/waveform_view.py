@@ -58,13 +58,15 @@ class WaveformView(TimelineView):
         """The envelope index, so sibling views (e.g. an overview) can reuse it instead of rebuilding."""
         return self._peaks
 
-    def set_clip(self, clip: AudioClip | None) -> None:
+    def set_clip(self, clip: AudioClip | None, reset_viewport: bool = True) -> None:
+        """Show ``clip``. Pass ``reset_viewport=False`` when a shared viewport is managed elsewhere."""
         self._clip = clip
         self._peaks = ClipPeaks(clip) if clip is not None else None
         self._renderers = [LaneRenderer() for _ in range(clip.channels if clip else 0)]
         self._position = 0.0
         self._invalidate()
-        self.viewport.set_duration(clip.duration if clip else 0.0)
+        if reset_viewport:
+            self.viewport.set_duration(clip.duration if clip else 0.0)
         self.update()
 
     @property

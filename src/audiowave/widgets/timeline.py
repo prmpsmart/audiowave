@@ -13,6 +13,7 @@ from PySide6.QtCore import QPointF, QRectF, Qt, Signal
 from PySide6.QtGui import (
     QColor,
     QEnterEvent,
+    QKeyEvent,
     QMouseEvent,
     QPainter,
     QPaintEvent,
@@ -57,6 +58,7 @@ class TimelineView(QWidget):
         self._position = 0.0
         self._loop: Loop | None = None
         self._markers: list[Marker] = []
+        self._highlights: list[Loop] = []
         self._follow = False
         self._show_ruler = True
 
@@ -106,6 +108,15 @@ class TimelineView(QWidget):
 
     def set_markers(self, markers: list[Marker]) -> None:
         self._markers = sorted(markers, key=lambda m: m.time)
+        self.update()
+
+    @property
+    def highlights(self) -> list[Loop]:
+        return list(self._highlights)
+
+    def set_highlights(self, ranges: list[Loop]) -> None:
+        """Shade time ranges, e.g. detected silences. Purely visual: they do not affect seek or loop."""
+        self._highlights = list(ranges)
         self.update()
 
     @property
@@ -192,6 +203,8 @@ class TimelineView(QWidget):
         painter.save()
         painter.setClipRect(QRectF(0, 0, self.width(), self.height()))
 
+        for span in self._highlights:
+            self._paint_highlight(painter, span, top, bottom)
         if self._loop is not None:
             self._paint_loop(painter, top, bottom)
         for marker in self._markers:
@@ -206,6 +219,16 @@ class TimelineView(QWidget):
             if self._show_ruler:
                 self._paint_time_flag(painter, x)
         painter.restore()
+
+    def _paint_highlight(self, painter: QPainter, span: Loop, top: float, bottom: float) -> None:
+        if span.end < self.viewport.start or span.start > self.viewport.end:
+            return
+        x0, x1 = self.time_to_x(span.start), self.time_to_x(span.end)
+        colour = QColor(self._palette.marker)
+        tint = QColor(colour)
+        tint.setAlpha(34)
+        painter.fillRect(QRectF(x0, top, max(x1 - x0, 1.0), bottom - top), tint)
+        painter.fillRect(QRectF(x0, top, max(x1 - x0, 1.0), 2), colour)
 
     def _paint_loop(self, painter: QPainter, top: float, bottom: float) -> None:
         assert self._loop is not None
@@ -331,6 +354,47 @@ class TimelineView(QWidget):
             self._loop = None
             self.loopChanged.emit(None)
             self.update()
+
+    def keyPressEvent(self, event: QKeyEvent) -> None:
+        """Keyboard navigation: arrows nudge the playhead (Shift = 10 s, Alt = 0.1 s), Home/End jump,
+        +/- zoom around the playhead, 0 fits the whole clip, PageUp/PageDown scroll a page."""
+        duration = self.viewport.duration
+        if duration <= 0:
+            return super().keyPressEvent(event)
+        mods = event.modifiers()
+        step = (
+            10.0
+            if mods & Qt.KeyboardModifier.ShiftModifier
+            else 0.1
+            if mods & Qt.KeyboardModifier.AltModifier
+            else 1.0
+        )
+        key, pos = event.key(), self._position
+        handled = True
+        if key == Qt.Key.Key_Left:
+            self.seekRequested.emit(max(pos - step, 0.0))
+        elif key == Qt.Key.Key_Right:
+            self.seekRequested.emit(min(pos + step, duration))
+        elif key == Qt.Key.Key_Home:
+            self.seekRequested.emit(0.0)
+        elif key == Qt.Key.Key_End:
+            self.seekRequested.emit(duration)
+        elif key in (Qt.Key.Key_Plus, Qt.Key.Key_Equal):
+            self.viewport.zoom(1.5, pos)
+        elif key in (Qt.Key.Key_Minus, Qt.Key.Key_Underscore):
+            self.viewport.zoom(1 / 1.5, pos)
+        elif key == Qt.Key.Key_0:
+            self.viewport.fit()
+        elif key == Qt.Key.Key_PageDown:
+            self.viewport.pan(self.viewport.span)
+        elif key == Qt.Key.Key_PageUp:
+            self.viewport.pan(-self.viewport.span)
+        else:
+            handled = False
+        if handled:
+            event.accept()
+        else:
+            super().keyPressEvent(event)
 
     def enterEvent(self, event: QEnterEvent) -> None:
         self.setFocus(Qt.FocusReason.MouseFocusReason)

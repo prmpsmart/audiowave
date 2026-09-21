@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import numpy as np
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
 
 from audiowave import LivePeaks
 from audiowave.audio import RecorderState, request_microphone
-from audiowave.widgets import LevelMeter, LiveWaveformView
+from audiowave.widgets import LevelMeter, LiveWaveformView, SpectrumView
 from studio.models import Take
 from studio.session import Session
 from studio.theme import get_theme
@@ -24,6 +25,7 @@ class RecordPage(QWidget):
         super().__init__(parent)
         self._s = session
         self._live: LivePeaks | None = None
+        self._tail = np.zeros(0, np.float32)  # the last few thousand samples, for the spectrum
         rec = session.recorder
 
         col = QVBoxLayout(self)
@@ -46,7 +48,16 @@ class RecordPage(QWidget):
         self.live_view = LiveWaveformView()
         self.live_view.setMinimumHeight(240)
         well_row.addWidget(self.live_view, 1)
-        col.addWidget(well, 1)
+        col.addWidget(well, 3)
+
+        spectrum_well = QFrame()
+        spectrum_well.setObjectName("well")
+        spectrum_layout = QVBoxLayout(spectrum_well)
+        spectrum_layout.setContentsMargins(6, 6, 6, 6)
+        self.spectrum = SpectrumView()
+        self.spectrum.setMinimumHeight(140)
+        spectrum_layout.addWidget(self.spectrum)
+        col.addWidget(spectrum_well, 2)
 
         col.addWidget(self._control_card())
 
@@ -182,6 +193,9 @@ class RecordPage(QWidget):
         if self._live is not None:
             self._live.append(samples)
             self.live_view.refresh()
+        rate = self._s.recorder.format.sample_rate if self._s.recorder.format else 44100
+        self._tail = np.concatenate([self._tail, samples.mean(axis=0)])[-4096:]
+        self.spectrum.feed(self._tail, rate)
 
     def _on_level(self, peaks: list[float]) -> None:
         for meter, peak in zip(self._meters, peaks, strict=False):
@@ -211,12 +225,15 @@ class RecordPage(QWidget):
         if idle:
             for meter in self._meters:
                 meter.reset()
+            self.spectrum.clear()
+            self._tail = np.zeros(0, np.float32)
         if idle and self._live is None:
             self._on_elapsed(0.0)
 
     def apply_appearance(self) -> None:
         a = self._s.appearance.appearance(0)
         self.live_view.set_appearance(a.with_(show_grid=False))
+        self.spectrum.set_theme(a.palette)
         t = get_theme()
         for meter in self._meters:
             meter.set_colors(t.accent, "#ff8a1f", t.red, t.line, t.text)
