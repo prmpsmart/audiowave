@@ -100,6 +100,11 @@ class MainWindow(QMainWindow):
         self._file.setObjectName("muted")
         self.message = QLabel()
         self.message.setObjectName("muted")
+        # An owned timer with a bound slot: a bare QTimer.singleShot(lambda) would fire after the window is gone.
+        self._message_timer = QTimer(self)
+        self._message_timer.setSingleShot(True)
+        self._message_timer.setInterval(MESSAGE_MS)
+        self._message_timer.timeout.connect(self._clear_message)
 
         self.tabs = Segmented(
             [
@@ -205,10 +210,10 @@ class MainWindow(QMainWindow):
         self.message.setText(text)
         set_property(self.message, "error", is_error)
         self.message.setStyleSheet(f"color: {get_theme().red if is_error else get_theme().teal};")
-        QTimer.singleShot(
-            MESSAGE_MS,
-            lambda t=text: self.message.setText("") if self.message.text() == t else None,
-        )
+        self._message_timer.start()  # restarts, so a newer message always gets its full time
+
+    def _clear_message(self) -> None:
+        self.message.setText("")
 
     def _on_take(self, take: Take | None) -> None:
         if take is None:

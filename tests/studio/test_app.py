@@ -2,7 +2,6 @@ import numpy as np
 import pytest
 from PySide6.QtCore import QPoint, Qt
 from PySide6.QtTest import QTest
-from studio.main import build_window
 from studio.models import Target
 from studio.theme import DARK, LIGHT, get_theme
 from studio.widgets.channel_strip import channel_gains
@@ -10,18 +9,6 @@ from studio.widgets.transport import split_time
 
 from audiowave import AudioClip, Loop
 from audiowave.audio import PlayerState
-
-
-@pytest.fixture
-def window(qtbot, tmp_path):
-    w = build_window(presets_path=tmp_path / "presets.json", settings_path=tmp_path / "s.ini")
-    qtbot.addWidget(w)
-    w.resize(1440, 900)
-    w.show()
-    w._s.player.set_volume(0.0)
-    yield w
-    w._s.player.stop()
-
 
 # -- pure helpers ---------------------------------------------------------------------------------
 
@@ -181,8 +168,11 @@ def test_opening_files_adds_takes_and_reports_bad_ones(qtbot, window, assets, tm
     assert s.open_file(tmp_path / "missing.wav") is None
     bad = tmp_path / "bad.wav"
     bad.write_bytes(b"nope")
-    assert s.open_file(bad) is None
-    assert [e for _, e in messages] == [True, True]
+    assert (
+        s.open_file(bad) is None
+    )  # not a valid WAV: handed to the decoder, which fails asynchronously
+    qtbot.waitUntil(lambda: any("Could not open bad.wav" in m for m, _ in messages), timeout=15000)
+    assert [e for _, e in messages if e] and messages[-1][1] is True
     assert s.takes.current is take  # failed opens leave the session untouched
 
 

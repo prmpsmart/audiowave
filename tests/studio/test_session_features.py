@@ -206,11 +206,11 @@ def test_normalising_loudness_changes_the_measured_loudness(qtbot, session):
     session.takes.add(tone_clip(8.0))
     session.run_edit("normalize_loudness", -20.0)
     wait_idle(qtbot, session)
-    with qtbot.waitSignal(
-        session.loudnessChanged, timeout=15000, check_params_cb=lambda v: v is not None
-    ):
-        pass
-    assert session.loudness.integrated == pytest.approx(-20.0, abs=0.5)
+    # poll the state: the re-measurement may already have finished while we waited for the edit
+    qtbot.waitUntil(
+        lambda: session.loudness is not None and abs(session.loudness.integrated + 20.0) < 0.5,
+        timeout=15000,
+    )
 
 
 def test_silences_are_found_highlighted_and_removed(qtbot, session):
