@@ -25,7 +25,7 @@ def test_zoom_keeps_the_anchor_under_the_cursor():
 def test_range_is_clamped_to_the_clip():
     v = vp()
     v.set_range(-50, 20)
-    assert (v.start, v.end) == (0, 70) or v.span == pytest.approx(70) and v.start >= 0
+    assert (v.start, v.end) == (0, 70) or (v.span == pytest.approx(70) and v.start >= 0)
     v.set_range(90, 200)
     assert v.end == pytest.approx(100) and v.start >= 0
     v.zoom(1e9)
@@ -77,7 +77,14 @@ def test_ticks_mark_majors_on_multiples_of_the_step():
 
 @pytest.mark.parametrize(
     ("t", "step", "text"),
-    [(0, 1, "0:00"), (65, 1, "1:05"), (3.5, 0.5, "0:03.5"), (3.25, 0.05, "0:03.25"), (3725, 1, "1:02:05"), (-4, 1, "0:00")],
+    [
+        (0, 1, "0:00"),
+        (65, 1, "1:05"),
+        (3.5, 0.5, "0:03.5"),
+        (3.25, 0.05, "0:03.25"),
+        (3725, 1, "1:02:05"),
+        (-4, 1, "0:00"),
+    ],
 )
 def test_format_time(t, step, text):
     assert format_time(t, step) == text

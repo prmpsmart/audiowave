@@ -32,10 +32,21 @@ def set_property(widget: QWidget, name: str, value: object) -> None:
     widget.update()
 
 
-def chip(text: str = "", accent: bool = False) -> QLabel:
-    label = QLabel(text)
-    label.setProperty("chip", "accent" if accent else "true")
-    return label
+class Chip(QLabel):
+    """A small pill of text that hides itself while empty."""
+
+    def __init__(self, text: str = "", accent: bool = False) -> None:
+        super().__init__()
+        self.setProperty("chip", "accent" if accent else "true")
+        self.setText(text)
+
+    def setText(self, text: str) -> None:
+        super().setText(text)
+        self.setVisible(bool(text))
+
+
+def chip(text: str = "", accent: bool = False) -> Chip:
+    return Chip(text, accent)
 
 
 def separator() -> QFrame:
@@ -61,7 +72,12 @@ class IconButton(QToolButton):
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
-        self._name, self._role, self._checked_role, self._icon_size = name, role, checked_role, icon_size
+        self._name, self._role, self._checked_role, self._icon_size = (
+            name,
+            role,
+            checked_role,
+            icon_size,
+        )
         self.setProperty("kind", kind)
         self.setFixedSize(size, size)
         self.setIconSize(QSize(icon_size, icon_size))
@@ -78,13 +94,10 @@ class IconButton(QToolButton):
     def refresh(self, theme: Theme | None = None) -> None:
         theme = theme or get_theme()
         role = self._checked_role if (self.isChecked() and self._checked_role) else self._role
-        if not self.isEnabled():
-            color = theme.dim
-        else:
-            color = getattr(theme, role)
+        color = theme.dim if not self.isEnabled() else getattr(theme, role)
         self.setIcon(icon(self._name, color, self._icon_size))
 
-    def changeEvent(self, event) -> None:  # noqa: N802
+    def changeEvent(self, event) -> None:
         super().changeEvent(event)
         if event.type().name == "EnabledChange":
             self.refresh()
@@ -95,17 +108,21 @@ class Segmented(QFrame):
 
     currentChanged = Signal(str)
 
-    def __init__(self, options: list[tuple[str, str]], parent: QWidget | None = None) -> None:
+    def __init__(self, options: list[tuple[str, ...]], parent: QWidget | None = None) -> None:
+        """``options`` are ``(key, label)`` or ``(key, label, icon_name)``."""
         super().__init__(parent)
         self.setObjectName("segmented")
+        self._icons: dict[str, str] = {}
         layout = QHBoxLayout(self)
         layout.setContentsMargins(2, 2, 2, 2)
         layout.setSpacing(2)
         self._group = QButtonGroup(self)
         self._group.setExclusive(True)
         self._buttons: dict[str, QPushButton] = {}
-        for key, label in options:
+        for key, label, *rest in options:
             button = QPushButton(label)
+            if rest:
+                self._icons[key] = rest[0]
             button.setProperty("segment", True)
             button.setCheckable(True)
             button.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -115,6 +132,12 @@ class Segmented(QFrame):
             layout.addWidget(button)
             button.clicked.connect(lambda _=False, k=key: self.currentChanged.emit(k))
         next(iter(self._buttons.values())).setChecked(True)
+        self.refresh_icons()
+
+    def refresh_icons(self) -> None:
+        color = get_theme().muted
+        for key, name in self._icons.items():
+            self._buttons[key].setIcon(icon(name, color, 16))
 
     @property
     def current(self) -> str:
@@ -216,6 +239,7 @@ class ColorSwatch(QPushButton):
         self.setProperty("ghost", True)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setFixedHeight(32)
+        self.setToolTip(color.upper())
         self.clicked.connect(self._pick)
 
     @property
@@ -225,12 +249,14 @@ class ColorSwatch(QPushButton):
     def set_color(self, color: str) -> None:
         if color != self._color:
             self._color = color
+            self.setToolTip(color.upper())
             self.update()
 
     def _pick(self) -> None:
         chosen = QColorDialog.getColor(QColor(self._color), self, self._label)
         if chosen.isValid() and chosen.name() != self._color:
             self._color = chosen.name()
+            self.setToolTip(self._color.upper())
             self.update()
             self.colorChanged.emit(self._color)
 
@@ -244,9 +270,11 @@ class ColorSwatch(QPushButton):
         p.setBrush(QColor(self._color))
         p.drawRoundedRect(chip_rect, 5, 5)
         p.setPen(QColor(t.muted))
-        p.drawText(QRectF(32, 0, self.width() - 32, self.height()), int(Qt.AlignmentFlag.AlignVCenter), self._label)
-        p.setPen(QColor(t.dim))
-        p.drawText(QRectF(0, 0, self.width() - 8, self.height()), int(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight), self._color.upper())
+        p.drawText(
+            QRectF(32, 0, self.width() - 32, self.height()),
+            int(Qt.AlignmentFlag.AlignVCenter),
+            self._label,
+        )
         p.end()
 
 

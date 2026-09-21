@@ -8,9 +8,9 @@ import numpy as np
 from PySide6.QtCore import QObject, QTimer, Signal
 from PySide6.QtMultimedia import QAudio, QAudioDevice, QAudioFormat, QAudioSink, QMediaDevices
 
+from audiowave.core.annotations import Loop
 from audiowave.core.clip import AudioClip
 from audiowave.core.format import SampleFormat, encode_pcm
-from audiowave.core.annotations import Loop
 
 from .pcm_source import PcmSource
 
@@ -218,7 +218,7 @@ class AudioPlayer(QObject):
             return False
 
         clip = self._clip
-        self._session_rate = max(int(round(clip.sample_rate * self._speed)), 1)
+        self._session_rate = max(round(clip.sample_rate * self._speed), 1)
         fmt = QAudioFormat()
         fmt.setSampleRate(self._session_rate)
         fmt.setChannelCount(clip.channels)

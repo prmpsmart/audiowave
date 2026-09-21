@@ -1,8 +1,14 @@
 {
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
     "python.analysis.extraPaths": [
-        "./audiowave",
-        "./py_audiowave",
-        "./mimi_wave_ui/mimi_wave",
-        "../prmp_qt-master/prmp_qt",
+        "./src"
     ],
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.formatOnSave": true
+    }
 }

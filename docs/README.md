@@ -1,28 +1,21 @@
 # AudioWave docs
 
-Working notes, screenshots and design proposals live here.
-
 ```
 docs/
 ├── README.md               this index
+├── architecture.md         layers, dependency rule, design decisions, rendering, playback, streaming, testing
 ├── screenshots/
-│   └── current-ui.png      the existing demo UI (copy of tests/test.PNG)
-└── design/
-    ├── ui-proposal.md      the new UI proposal: screens, feature map, styles, build order
-    ├── 01-player.png       player screen
-    ├── 02-player-annotated.png
-    ├── 03-stream.png       Mimi Wave stream screen
-    ├── 04-stream-annotated.png
-    ├── 05-style-lab.png    twelve waveform renderers
-    ├── render.sh           regenerates the PNGs from the mockup
-    └── mockups/
-        └── studio.html     the design source (HTML/CSS/canvas)
+│   ├── studio-*.png        the real app (regenerate with scripts/screenshots.py)
+│   └── current-ui.png      the 0.1 demo UI, for comparison
+├── design/
+│   ├── ui-proposal.md      the UI proposal, with a status section on what was built
+│   ├── 01..05-*.png        proposal mockups
+│   ├── render.sh           regenerates the mockup PNGs
+│   └── mockups/studio.html the mockup source (HTML/CSS/canvas)
+└── legacy/                 notes carried over from 0.1
 ```
 
-## Design mockups
-
-Start with [design/ui-proposal.md](design/ui-proposal.md).
-
-To iterate on a design, edit `design/mockups/studio.html` and run `design/render.sh`. The same file renders each screen
-through a query string (`?mode=stream`, `?mode=gallery`, `&annotate`), so you can also open it directly in a browser.
-The mockup is a picture of the intended result, not code that ships. The Qt implementation is a separate step.
+- **Using the library:** the root [README](../README.md) and [`examples/`](../examples).
+- **Understanding the design:** [architecture.md](architecture.md).
+- **Where the UI came from:** [design/ui-proposal.md](design/ui-proposal.md). The mockups are pictures of intent;
+  the running app is the source of truth.

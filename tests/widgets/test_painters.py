@@ -33,13 +33,26 @@ def render(style: str, appearance: Appearance | None = None) -> QImage:
 
 def lit_pixels(image: QImage) -> int:
     ptr = image.constBits()
-    arr = np.frombuffer(ptr, np.uint8).reshape(image.height(), image.bytesPerLine() // 4, 4)[:, : image.width()]
+    arr = np.frombuffer(ptr, np.uint8).reshape(image.height(), image.bytesPerLine() // 4, 4)[
+        :, : image.width()
+    ]
     return int((arr[..., :3].max(axis=2) > 40).sum())
 
 
 def test_every_registered_style_draws_something_inside_its_rect():
     names = painter_names()
-    assert {"bars", "capsule", "hair", "env", "line", "stairs", "dots", "rms", "ground", "radial"} <= set(names)
+    assert {
+        "bars",
+        "capsule",
+        "hair",
+        "env",
+        "line",
+        "stairs",
+        "dots",
+        "rms",
+        "ground",
+        "radial",
+    } <= set(names)
     for name in names:
         image = render(name)
         assert 200 < lit_pixels(image) < W * H * 0.9, name
@@ -94,7 +107,9 @@ def test_radial_played_region_is_a_clockwise_pie():
     rect = QRectF(0, 0, 100, 100)
     half = radial.played_region(rect, 0.5)
     assert isinstance(half, QPainterPath)
-    assert half.contains(rect.center() + rect.center() * 0.5) and not half.contains(rect.center() * 0.5)  # right yes, left no
+    assert half.contains(rect.center() + rect.center() * 0.5) and not half.contains(
+        rect.center() * 0.5
+    )  # right yes, left no
     assert radial.played_region(rect, 1.0) == rect
 
 
@@ -104,7 +119,9 @@ def test_default_played_region_is_the_left_fraction():
 
 
 def test_lane_renderer_colours_played_and_unplayed_and_caches(qapp):
-    a = Appearance(style="env", show_midline=False).with_palette(played="#ff0000", unplayed="#0000ff")
+    a = Appearance(style="env", show_midline=False).with_palette(
+        played="#ff0000", unplayed="#0000ff"
+    )
     style = get_painter("env")
     peaks = make_peaks(style.buckets(W, a))
     lane, image = LaneRenderer(), QImage(W, H, QImage.Format.Format_ARGB32)
@@ -116,4 +133,6 @@ def test_lane_renderer_colours_played_and_unplayed_and_caches(qapp):
     assert lane._key == first_key
     p.end()
     left, right = QColor(image.pixel(W // 4, H // 2)), QColor(image.pixel(3 * W // 4, H // 2))
-    assert left.red() > 150 > left.blue() or right.blue() > 150  # mid-lane pixels use the two colours
+    assert (
+        left.red() > 150 > left.blue() or right.blue() > 150
+    )  # mid-lane pixels use the two colours

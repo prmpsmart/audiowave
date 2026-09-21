@@ -12,4 +12,14 @@ from .kit import (
     set_property,
 )
 
-__all__ = ["ColorSwatch", "IconButton", "LabeledSlider", "Section", "Segmented", "Toggle", "chip", "separator", "set_property"]
+__all__ = [
+    "ColorSwatch",
+    "IconButton",
+    "LabeledSlider",
+    "Section",
+    "Segmented",
+    "Toggle",
+    "chip",
+    "separator",
+    "set_property",
+]

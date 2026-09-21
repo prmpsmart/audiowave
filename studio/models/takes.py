@@ -42,7 +42,13 @@ class TakesModel(QObject):
     def current(self) -> Take | None:
         return self._current
 
-    def add(self, clip: AudioClip, name: str | None = None, path: Path | None = None, select: bool = True) -> Take:
+    def add(
+        self,
+        clip: AudioClip,
+        name: str | None = None,
+        path: Path | None = None,
+        select: bool = True,
+    ) -> Take:
         take = Take(self._next_id, name or f"Take {self._next_id}", clip, path=path)
         self._next_id += 1
         self._takes.append(take)

@@ -19,7 +19,12 @@ class PresetStore:
 
     def load(self, name: str) -> Appearance | None:
         data = self._read().get(name)
-        return Appearance.from_dict(data) if data else None
+        if not data:
+            return None
+        try:
+            return Appearance.from_dict(data)
+        except (TypeError, ValueError):  # e.g. an unknown gravity value written by a newer version
+            return None
 
     def save(self, name: str, appearance: Appearance) -> None:
         data = self._read()
@@ -36,7 +41,11 @@ class PresetStore:
             data = json.loads(self._path.read_text())
         except (OSError, ValueError):
             return {}
-        return data if isinstance(data, dict) else {}
+        if not isinstance(data, dict):
+            return {}
+        return {
+            name: entry for name, entry in data.items() if isinstance(entry, dict)
+        }  # drop malformed entries
 
     def _write(self, data: dict) -> None:
         self._path.parent.mkdir(parents=True, exist_ok=True)

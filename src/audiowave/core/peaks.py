@@ -165,6 +165,6 @@ class ClipPeaks:
 
     def query(self, start: float, stop: float, buckets: int) -> list[Peaks]:
         """Per-channel envelopes for the time range ``[start, stop)`` in seconds."""
-        a = int(round(start * self.sample_rate))
-        b = int(round(stop * self.sample_rate))
+        a = round(start * self.sample_rate)
+        b = round(stop * self.sample_rate)
         return [p.query(a, b, buckets) for p in self.pyramids]

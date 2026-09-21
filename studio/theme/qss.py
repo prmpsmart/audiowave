@@ -61,6 +61,7 @@ QToolButton {{ background: {t.surface2}; border: 1px solid {t.line2}; border-rad
 QToolButton:hover {{ border-color: {t.muted}; }}
 QToolButton:disabled {{ border-color: {t.line}; }}
 QToolButton[kind="play"] {{ background: {t.accent}; border: 1px solid {t.accent}; border-radius: 31px; }}
+QToolButton[kind="recbig"] {{ background: {t.red}; border: 1px solid {t.red}; border-radius: 31px; }}
 QToolButton[kind="small"] {{ border-radius: 17px; }}
 QToolButton[kind="flat"] {{ background: transparent; border: none; border-radius: 7px; }}
 QToolButton[kind="flat"]:hover {{ background: {t.surface2}; }}

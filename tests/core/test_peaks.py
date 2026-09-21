@@ -1,15 +1,19 @@
+from itertools import pairwise
+
 import numpy as np
 import pytest
 
-from audiowave.core import AudioClip, ClipPeaks, LivePeaks, PeakPyramid, Peaks
+from audiowave.core import ClipPeaks, LivePeaks, PeakPyramid, Peaks
 
 
 def brute(x, start, stop, buckets):
     edges = np.linspace(start, stop, buckets + 1).astype(int)
     mn, mx, rms = [], [], []
-    for a, b in zip(edges[:-1], edges[1:], strict=True):
+    for a, b in pairwise(edges):
         seg = x[a : max(b, a + 1)]
-        mn.append(seg.min()); mx.append(seg.max()); rms.append(np.sqrt(np.mean(seg**2)))
+        mn.append(seg.min())
+        mx.append(seg.max())
+        rms.append(np.sqrt(np.mean(seg**2)))
     return np.array(mn), np.array(mx), np.array(rms)
 
 
@@ -18,7 +22,11 @@ def test_direct_query_matches_brute_force():
     p = PeakPyramid(x).query(0, 5000, 100)
     mn, mx, rms = brute(x, 0, 5000, 100)
     assert len(p) == 100
-    assert np.allclose(p.minimum, mn) and np.allclose(p.maximum, mx) and np.allclose(p.rms, rms, atol=1e-6)
+    assert (
+        np.allclose(p.minimum, mn)
+        and np.allclose(p.maximum, mx)
+        and np.allclose(p.rms, rms, atol=1e-6)
+    )
 
 
 def test_pyramid_level_query_is_close_to_brute_force():
@@ -76,7 +84,9 @@ def test_live_peaks_match_batch_result_for_any_chunking():
     got = live.peaks()
     assert live.frames == 5000 and len(got[0]) == 50
     ref = x[0].reshape(50, 100)
-    assert np.allclose(got[0].maximum, ref.max(axis=1)) and np.allclose(got[0].minimum, ref.min(axis=1))
+    assert np.allclose(got[0].maximum, ref.max(axis=1)) and np.allclose(
+        got[0].minimum, ref.min(axis=1)
+    )
     assert np.allclose(got[1].rms, np.sqrt((x[1].reshape(50, 100) ** 2).mean(axis=1)), atol=1e-6)
 
 

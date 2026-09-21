@@ -19,7 +19,9 @@ from .viewport import Viewport
 LANE_GAP = 6
 
 
-def layout_lanes(width: float, height: float, channels: int, top: float, gap: float = LANE_GAP) -> list[QRectF]:
+def layout_lanes(
+    width: float, height: float, channels: int, top: float, gap: float = LANE_GAP
+) -> list[QRectF]:
     """Stack ``channels`` equal lanes in ``height`` below ``top``. Shared with widgets that must line up with them."""
     if channels <= 0:
         return []
@@ -158,7 +160,10 @@ class WaveformView(TimelineView):
             )
             if channel:
                 painter.setPen(QColor(appearance.palette.grid))
-                painter.drawLine(QPointF(0, lane.top() - LANE_GAP / 2), QPointF(lane.right(), lane.top() - LANE_GAP / 2))
+                painter.drawLine(
+                    QPointF(0, lane.top() - LANE_GAP / 2),
+                    QPointF(lane.right(), lane.top() - LANE_GAP / 2),
+                )
 
     def _paint_guides(self, painter: QPainter, lane: QRectF, appearance: Appearance) -> None:
         grid = QColor(appearance.palette.grid)

@@ -19,7 +19,9 @@ class AudioDevice:
 
 def _wrap(devices: list[QAudioDevice], default: QAudioDevice) -> list[AudioDevice]:
     default_id = bytes(default.id()) if not default.isNull() else b""
-    return [AudioDevice(bytes(d.id()), d.description(), bytes(d.id()) == default_id, d) for d in devices]
+    return [
+        AudioDevice(bytes(d.id()), d.description(), bytes(d.id()) == default_id, d) for d in devices
+    ]
 
 
 def input_devices() -> list[AudioDevice]:

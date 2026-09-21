@@ -78,11 +78,20 @@ class VectorscopeView(QWidget):
             x, y = stereo_xy(left * self._gain, right * self._gain)
             xs, ys = centre.x() + x * radius, centre.y() - y * radius
             chunk = max(len(xs) // _BATCHES, 1)
-            painter.setPen(QPen(QColor(palette.played), 2.2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+            painter.setPen(
+                QPen(QColor(palette.played), 2.2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap)
+            )
             for b in range(_BATCHES):
                 part = slice(b * chunk, None if b == _BATCHES - 1 else (b + 1) * chunk)
                 painter.setOpacity(0.18 + 0.82 * (b + 1) / _BATCHES)
-                painter.drawPoints(QPolygonF([QPointF(px, py) for px, py in zip(xs[part].tolist(), ys[part].tolist(), strict=True)]))
+                painter.drawPoints(
+                    QPolygonF(
+                        [
+                            QPointF(px, py)
+                            for px, py in zip(xs[part].tolist(), ys[part].tolist(), strict=True)
+                        ]
+                    )
+                )
             painter.setOpacity(1.0)
 
         painter.setPen(QColor(palette.text))
@@ -95,7 +104,14 @@ class VectorscopeView(QWidget):
         painter.setBrush(Qt.BrushStyle.NoBrush)
         painter.drawEllipse(c, r, r)
         painter.drawEllipse(c, r / 2, r / 2)
-        painter.drawPolygon([QPointF(c.x(), c.y() - r), QPointF(c.x() + r, c.y()), QPointF(c.x(), c.y() + r), QPointF(c.x() - r, c.y())])
+        painter.drawPolygon(
+            [
+                QPointF(c.x(), c.y() - r),
+                QPointF(c.x() + r, c.y()),
+                QPointF(c.x(), c.y() + r),
+                QPointF(c.x() - r, c.y()),
+            ]
+        )
         painter.drawLine(QPointF(c.x(), c.y() - r), QPointF(c.x(), c.y() + r))
         painter.drawLine(QPointF(c.x() - r, c.y()), QPointF(c.x() + r, c.y()))
         painter.setPen(QColor(self._palette.text))

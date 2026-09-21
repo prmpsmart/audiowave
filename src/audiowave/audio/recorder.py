@@ -61,7 +61,9 @@ class AudioRecorder(QObject):
     def elapsed(self) -> float:
         return self._frames / self._format.sample_rate if self._format else 0.0
 
-    def start(self, sample_rate: int = 44100, channels: int = 1, device: QAudioDevice | None = None) -> bool:
+    def start(
+        self, sample_rate: int = 44100, channels: int = 1, device: QAudioDevice | None = None
+    ) -> bool:
         """Begin a new recording. Returns False (and emits ``errorOccurred``) if it cannot start."""
         if self._state is not RecorderState.STOPPED:
             return False
@@ -89,7 +91,9 @@ class AudioRecorder(QObject):
         self._source.stateChanged.connect(self._on_source_state)
         self._io = self._source.start()
         if self._io is None:
-            self.errorOccurred.emit("Could not open the input device (is microphone access allowed?)")
+            self.errorOccurred.emit(
+                "Could not open the input device (is microphone access allowed?)"
+            )
             self._reset()
             return False
         self._io.readyRead.connect(self._drain)

@@ -17,7 +17,7 @@ class AudioClip:
     marked read-only so peak caches built from it can never go stale.
     """
 
-    __slots__ = ("_samples", "_sample_rate")
+    __slots__ = ("_sample_rate", "_samples")
 
     def __init__(self, samples: np.ndarray, sample_rate: int) -> None:
         samples = np.asarray(samples, dtype=np.float32)
@@ -45,7 +45,7 @@ class AudioClip:
 
     @classmethod
     def silence(cls, seconds: float, sample_rate: int = 44100, channels: int = 1) -> AudioClip:
-        return cls(np.zeros((channels, int(round(seconds * sample_rate))), np.float32), sample_rate)
+        return cls(np.zeros((channels, round(seconds * sample_rate)), np.float32), sample_rate)
 
     @classmethod
     def concatenate(cls, clips: Iterable[AudioClip]) -> AudioClip:
@@ -99,7 +99,11 @@ class AudioClip:
         return float(np.abs(self._samples).max()) if self.frames else 0.0
 
     def rms(self) -> float:
-        return float(np.sqrt(np.mean(np.square(self._samples, dtype=np.float64)))) if self.frames else 0.0
+        return (
+            float(np.sqrt(np.mean(np.square(self._samples, dtype=np.float64))))
+            if self.frames
+            else 0.0
+        )
 
     def channel_peaks(self) -> list[float]:
         return [float(np.abs(ch).max()) if ch.size else 0.0 for ch in self._samples]

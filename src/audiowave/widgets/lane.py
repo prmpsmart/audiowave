@@ -57,23 +57,36 @@ class LaneRenderer:
             draw_unplayed = lambda p: p.drawPixmap(rect.topLeft(), unplayed_pm)  # noqa: E731
             draw_played = lambda p: p.drawPixmap(rect.topLeft(), played_pm)  # noqa: E731
 
-        self._composite(painter, rect, style.played_region(rect, progress), progress, draw_unplayed, draw_played)
+        self._composite(
+            painter, rect, style.played_region(rect, progress), progress, draw_unplayed, draw_played
+        )
 
     # -- internals ------------------------------------------------------------------------------
 
     @staticmethod
-    def _render(style: WavePainter, rect: QRectF, peaks: Peaks, appearance: Appearance, color: str, dpr: float) -> QPixmap:
+    def _render(
+        style: WavePainter,
+        rect: QRectF,
+        peaks: Peaks,
+        appearance: Appearance,
+        color: str,
+        dpr: float,
+    ) -> QPixmap:
         pixmap = QPixmap(math.ceil(rect.width() * dpr), math.ceil(rect.height() * dpr))
         pixmap.setDevicePixelRatio(dpr)
         pixmap.fill(Qt.GlobalColor.transparent)
         p = QPainter(pixmap)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
-        style.paint(p, PaintJob(QRectF(0, 0, rect.width(), rect.height()), peaks, appearance), QColor(color))
+        style.paint(
+            p, PaintJob(QRectF(0, 0, rect.width(), rect.height()), peaks, appearance), QColor(color)
+        )
         p.end()
         return pixmap
 
     @staticmethod
-    def _direct(style: WavePainter, rect: QRectF, peaks: Peaks, appearance: Appearance, color: str) -> Callable[[QPainter], None]:
+    def _direct(
+        style: WavePainter, rect: QRectF, peaks: Peaks, appearance: Appearance, color: str
+    ) -> Callable[[QPainter], None]:
         def draw(p: QPainter) -> None:
             p.save()
             p.setRenderHint(QPainter.RenderHint.Antialiasing)
@@ -97,7 +110,9 @@ class LaneRenderer:
         elif progress <= 0.0:
             draw_unplayed(painter)
         elif isinstance(region, QRectF):
-            painter.setClipRect(QRectF(region.right(), rect.top(), rect.right() - region.right(), rect.height()))
+            painter.setClipRect(
+                QRectF(region.right(), rect.top(), rect.right() - region.right(), rect.height())
+            )
             draw_unplayed(painter)
             painter.setClipRect(region)
             draw_played(painter)

@@ -10,10 +10,10 @@ from PySide6.QtGui import QColor, QMouseEvent, QPainter, QPaintEvent, QPen
 from PySide6.QtWidgets import QWidget
 
 from audiowave.appearance import Appearance
+from audiowave.core.annotations import Loop
 from audiowave.core.clip import AudioClip
 from audiowave.core.peaks import ClipPeaks, Peaks
 
-from audiowave.core.annotations import Loop
 from .lane import LaneRenderer
 from .viewport import Viewport
 
@@ -39,7 +39,9 @@ class OverviewView(QWidget):
         super().__init__(parent)
         self.viewport = viewport
         self.viewport.changed.connect(self.update)
-        self._appearance = Appearance(style="hair", bar_width=1, bar_spacing=1, scale=1.0, show_midline=False)
+        self._appearance = Appearance(
+            style="hair", bar_width=1, bar_spacing=1, scale=1.0, show_midline=False
+        )
         self._peaks: ClipPeaks | None = None
         self._renderer = LaneRenderer()
         self._cached: Peaks | None = None
@@ -53,13 +55,17 @@ class OverviewView(QWidget):
 
     def set_clip(self, clip: AudioClip | None, peaks: ClipPeaks | None = None) -> None:
         """Show ``clip``. Pass an existing ``ClipPeaks`` to avoid recomputing it."""
-        self._peaks = peaks if peaks is not None else (ClipPeaks(clip) if clip is not None else None)
+        self._peaks = (
+            peaks if peaks is not None else (ClipPeaks(clip) if clip is not None else None)
+        )
         self._cached = None
         self._position = 0.0
         self.update()
 
     def set_appearance(self, appearance: Appearance) -> None:
-        self._appearance = appearance.with_(style="hair", bar_width=1, bar_spacing=1, scale=1.0, show_midline=False)
+        self._appearance = appearance.with_(
+            style="hair", bar_width=1, bar_spacing=1, scale=1.0, show_midline=False
+        )
         self._cached = None
         self.update()
 
@@ -78,7 +84,9 @@ class OverviewView(QWidget):
         return t / d * self.width() if d > 0 else 0.0
 
     def _t(self, x: float) -> float:
-        return min(max(x / max(self.width(), 1) * self.viewport.duration, 0.0), self.viewport.duration)
+        return min(
+            max(x / max(self.width(), 1) * self.viewport.duration, 0.0), self.viewport.duration
+        )
 
     def _window(self) -> QRectF:
         return QRectF(self._x(self.viewport.start), 0, self._x(self.viewport.span), self.height())
@@ -100,14 +108,21 @@ class OverviewView(QWidget):
             self._cached = self._mix(merged)
             self._cached_width = self.width()
         self._renderer.paint(
-            painter, lane, self._cached, self._appearance, self._position / self.viewport.duration, token=("ov", self.width())
+            painter,
+            lane,
+            self._cached,
+            self._appearance,
+            self._position / self.viewport.duration,
+            token=("ov", self.width()),
         )
 
         window = self._window()
         shade = QColor(palette.background)
         shade.setAlpha(150)
         painter.fillRect(QRectF(0, 0, window.left(), self.height()), shade)
-        painter.fillRect(QRectF(window.right(), 0, self.width() - window.right(), self.height()), shade)
+        painter.fillRect(
+            QRectF(window.right(), 0, self.width() - window.right(), self.height()), shade
+        )
 
         accent = QColor(palette.played)
         painter.setPen(QPen(accent, 1.5))
@@ -120,10 +135,13 @@ class OverviewView(QWidget):
 
         if self._loop is not None:
             painter.fillRect(
-                QRectF(self._x(self._loop.start), self.height() - 3, self._x(self._loop.length), 3), QColor(palette.loop)
+                QRectF(self._x(self._loop.start), self.height() - 3, self._x(self._loop.length), 3),
+                QColor(palette.loop),
             )
         painter.setPen(QPen(QColor(palette.playhead), 1.5))
-        painter.drawLine(QPointF(self._x(self._position), 0), QPointF(self._x(self._position), self.height()))
+        painter.drawLine(
+            QPointF(self._x(self._position), 0), QPointF(self._x(self._position), self.height())
+        )
         painter.end()
 
     @staticmethod
@@ -152,7 +170,9 @@ class OverviewView(QWidget):
         self._grab = self._hit(x)
         if self._grab is _Grab.NONE:  # click outside: centre the window there and keep dragging it
             centre = self._t(x)
-            self.viewport.set_range(centre - self.viewport.span / 2, centre + self.viewport.span / 2)
+            self.viewport.set_range(
+                centre - self.viewport.span / 2, centre + self.viewport.span / 2
+            )
             self._grab = _Grab.MOVE
         self._grab_offset = self._t(x) - self.viewport.start
 
@@ -163,9 +183,13 @@ class OverviewView(QWidget):
             start = t - self._grab_offset
             self.viewport.set_range(start, start + self.viewport.span)
         elif self._grab is _Grab.LEFT:
-            self.viewport.set_range(min(t, self.viewport.end - Viewport.MIN_SPAN), self.viewport.end)
+            self.viewport.set_range(
+                min(t, self.viewport.end - Viewport.MIN_SPAN), self.viewport.end
+            )
         elif self._grab is _Grab.RIGHT:
-            self.viewport.set_range(self.viewport.start, max(t, self.viewport.start + Viewport.MIN_SPAN))
+            self.viewport.set_range(
+                self.viewport.start, max(t, self.viewport.start + Viewport.MIN_SPAN)
+            )
         else:
             hit = self._hit(x)
             self.setCursor(

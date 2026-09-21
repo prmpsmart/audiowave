@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from itertools import pairwise
+
 import numpy as np
 from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen
@@ -42,7 +44,7 @@ def _smooth(points: list[QPointF]) -> QPainterPath:
     if not points:
         return path
     path.moveTo(points[0])
-    for prev, cur in zip(points, points[1:], strict=False):
+    for prev, cur in pairwise(points):
         path.quadTo(prev, (prev + cur) / 2)
     path.lineTo(points[-1])
     return path
@@ -56,7 +58,9 @@ class _Outline(WavePainter):
 
     @staticmethod
     def _xs(job: PaintJob) -> np.ndarray:
-        return np.linspace(job.rect.left(), job.rect.right(), max(len(job.peaks), 2))[: len(job.peaks)]
+        return np.linspace(job.rect.left(), job.rect.right(), max(len(job.peaks), 2))[
+            : len(job.peaks)
+        ]
 
 
 @register
@@ -84,7 +88,15 @@ class SmoothLine(_Outline):
 
         painter.save()
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        painter.setPen(QPen(color, 1.6, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin))
+        painter.setPen(
+            QPen(
+                color,
+                1.6,
+                Qt.PenStyle.SolidLine,
+                Qt.PenCapStyle.RoundCap,
+                Qt.PenJoinStyle.RoundJoin,
+            )
+        )
         painter.setBrush(Qt.BrushStyle.NoBrush)
         painter.drawPath(_smooth(top))
         painter.drawPath(_smooth(bottom))

@@ -29,7 +29,9 @@ def heat_lut(palette: Palette) -> np.ndarray:
     positions = np.array([s[0] for s in stops])
     channels = np.array([[c.red(), c.green(), c.blue()] for _, c in stops], np.float64)
     x = np.linspace(0, 1, 256)
-    rgb = np.stack([np.interp(x, positions, channels[:, i]) for i in range(3)], axis=1).astype(np.uint32)
+    rgb = np.stack([np.interp(x, positions, channels[:, i]) for i in range(3)], axis=1).astype(
+        np.uint32
+    )
     return (0xFF << 24) | (rgb[:, 0] << 16) | (rgb[:, 1] << 8) | rgb[:, 2]
 
 
@@ -48,7 +50,9 @@ class SpectrogramView(TimelineView):
     def set_clip(self, clip: AudioClip | None, channel: int = 0) -> None:
         """Analyse ``channel`` of ``clip``. The viewport is only reset if its duration differs."""
         self._clip, self._channel = clip, channel
-        self._spec = spectrogram(clip.channel(channel), clip.sample_rate) if clip is not None else None
+        self._spec = (
+            spectrogram(clip.channel(channel), clip.sample_rate) if clip is not None else None
+        )
         self._image = None
         if clip is not None and abs(self.viewport.duration - clip.duration) > 1e-6:
             self.viewport.set_duration(clip.duration)
@@ -90,7 +94,9 @@ class SpectrogramView(TimelineView):
 
         c0, c1 = column(self.viewport.start), column(self.viewport.end)
         painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
-        painter.drawImage(rect, self._image, QRectF(c0, 0, max(c1 - c0, 1e-3), self._image.height()))
+        painter.drawImage(
+            rect, self._image, QRectF(c0, 0, max(c1 - c0, 1e-3), self._image.height())
+        )
         self._paint_frequency_axis(painter, rect, spec)
 
     def _paint_frequency_axis(self, painter: QPainter, rect: QRectF, spec: Spectrogram) -> None:
@@ -103,9 +109,13 @@ class SpectrogramView(TimelineView):
             y = rect.bottom() - hz / spec.nyquist * rect.height()
             painter.setPen(QColor(255, 255, 255, 34))
             painter.drawLine(rect.left(), y, rect.right(), y)
-            if last_label_y - y >= painter.fontMetrics().height():  # labels closer than a line would collide
+            if (
+                last_label_y - y >= painter.fontMetrics().height()
+            ):  # labels closer than a line would collide
                 painter.setPen(QColor(255, 255, 255, 170))
-                painter.drawText(rect.left() + 6, int(y) - 3, f"{hz // 1000}k" if hz >= 1000 else str(hz))
+                painter.drawText(
+                    rect.left() + 6, int(y) - 3, f"{hz // 1000}k" if hz >= 1000 else str(hz)
+                )
                 last_label_y = y
         painter.setPen(Qt.PenStyle.NoPen)
         painter.restore()

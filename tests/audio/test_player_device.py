@@ -38,7 +38,9 @@ def test_play_advances_the_position_then_finishes(qtbot, player, clip):
     player.positionChanged.connect(positions.append)
     with qtbot.waitSignal(player.finished, timeout=4000):
         player.play()
-    assert player.state is PlayerState.STOPPED and player.position == pytest.approx(clip.duration, abs=0.02)
+    assert player.state is PlayerState.STOPPED and player.position == pytest.approx(
+        clip.duration, abs=0.02
+    )
     assert len(positions) > 3 and positions == sorted(positions)  # monotonic, from the device clock
 
 
@@ -104,6 +106,8 @@ def test_channel_gains_can_be_set_and_cleared(player):
     player.set_channel_gains([1.0, 0.0])
     assert player._gains == (1.0, 0.0)
     left = np.frombuffer(player._pcm, "<i2").reshape(-1, 2)
-    assert np.abs(left[:, 0]).max() > 0 and not left[:, 1].any()  # right channel muted in the encoded stream
+    assert (
+        np.abs(left[:, 0]).max() > 0 and not left[:, 1].any()
+    )  # right channel muted in the encoded stream
     player.set_channel_gains(None)
     assert np.frombuffer(player._pcm, "<i2").reshape(-1, 2)[:, 1].any()

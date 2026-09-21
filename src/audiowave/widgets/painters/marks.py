@@ -55,6 +55,7 @@ class Radial(WavePainter):
     label = "Radial"
     uses_bar_shape = True
     uses_gravity = False
+    full_span = True
 
     SPOKES = 120
     INNER = 0.36  # inner radius as a fraction of the outer radius
@@ -83,7 +84,9 @@ class Radial(WavePainter):
         ]
         painter.save()
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        painter.setPen(QPen(color, max(a.bar_width * 0.8, 1.6), Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+        painter.setPen(
+            QPen(color, max(a.bar_width * 0.8, 1.6), Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap)
+        )
         painter.drawLines(lines)
         ring = QColor(color)
         ring.setAlphaF(color.alphaF() * 0.25)
@@ -100,6 +103,10 @@ class Radial(WavePainter):
         reach = math.hypot(rect.width(), rect.height())
         pie = QPainterPath()
         pie.moveTo(centre)
-        pie.arcTo(QRectF(centre.x() - reach, centre.y() - reach, reach * 2, reach * 2), 90.0, -360.0 * progress)
+        pie.arcTo(
+            QRectF(centre.x() - reach, centre.y() - reach, reach * 2, reach * 2),
+            90.0,
+            -360.0 * progress,
+        )
         pie.closeSubpath()
         return pie

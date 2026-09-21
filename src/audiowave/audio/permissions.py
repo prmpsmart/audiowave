@@ -35,5 +35,7 @@ def request_microphone(receiver: QObject, callback: Callable[[bool], None]) -> N
         return
     app = QCoreApplication.instance()
     app.requestPermission(  # type: ignore[union-attr]
-        QMicrophonePermission(), receiver, lambda p: callback(p.status() == Qt.PermissionStatus.Granted)
+        QMicrophonePermission(),
+        receiver,
+        lambda p: callback(p.status() == Qt.PermissionStatus.Granted),
     )

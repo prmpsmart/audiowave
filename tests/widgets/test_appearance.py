@@ -27,5 +27,7 @@ def test_dict_roundtrip_including_enum_and_palette():
 
 
 def test_from_dict_ignores_unknown_keys_and_tolerates_partial_presets():
-    b = Appearance.from_dict({"style": "line", "future_option": 1, "palette": {"played": "#000000", "nope": "x"}})
+    b = Appearance.from_dict(
+        {"style": "line", "future_option": 1, "palette": {"played": "#000000", "nope": "x"}}
+    )
     assert b.style == "line" and b.palette.played == "#000000" and b.bar_width == 3.0

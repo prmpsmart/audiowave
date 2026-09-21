@@ -24,7 +24,10 @@ def load_fonts() -> Fonts:
     families = set(QFontDatabase.families())
 
     def pick(wanted: str, *fallbacks: str) -> str:
-        return next((f for f in (wanted, *fallbacks) if f in families), fallbacks[-1] if fallbacks else wanted)
+        return next(
+            (f for f in (wanted, *fallbacks) if f in families),
+            fallbacks[-1] if fallbacks else wanted,
+        )
 
     return Fonts(
         serif=pick("Instrument Serif", "Georgia", "Times New Roman"),

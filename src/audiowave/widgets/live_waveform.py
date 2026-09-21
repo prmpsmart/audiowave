@@ -57,6 +57,10 @@ class LiveWaveformView(QWidget):
         a = self._appearance
         painter.fillRect(self.rect(), QColor(a.palette.background))
         if self._live is None or not self._renderers:
+            painter.setPen(QPen(QColor(a.palette.grid).lighter(150), 1, Qt.PenStyle.DashLine))
+            painter.drawLine(
+                QPointF(0, self.height() / 2), QPointF(self.width(), self.height() / 2)
+            )
             painter.end()
             return
 
@@ -75,7 +79,9 @@ class LiveWaveformView(QWidget):
             painter.setPen(QPen(QColor(a.palette.grid).lighter(150), 1, Qt.PenStyle.DashLine))
             painter.drawLine(QPointF(filled, mid), QPointF(self.width(), mid))
             if len(peaks):
-                self._renderers[channel].paint(painter, QRectF(0, top + 4, filled, lane_h - 8), peaks, a, 1.0)
+                self._renderers[channel].paint(
+                    painter, QRectF(0, top + 4, filled, lane_h - 8), peaks, a, 1.0
+                )
 
             painter.setPen(QPen(head_color, 1.5))
             painter.drawLine(QPointF(filled, top + 6), QPointF(filled, top + lane_h - 6))

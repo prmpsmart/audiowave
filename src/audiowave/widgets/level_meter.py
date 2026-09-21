@@ -100,10 +100,16 @@ class LevelMeter(QWidget):
             f = i / self._segments
             painter.setBrush(self._segment_color(f) if f < lit else QColor(self._off))
             a, b = i * cell + 0.6, cell - 1.6
-            rect = QRectF(0, length - a - b, thickness, b) if vertical else QRectF(a, 0, b, thickness)
+            rect = (
+                QRectF(0, length - a - b, thickness, b) if vertical else QRectF(a, 0, b, thickness)
+            )
             painter.drawRoundedRect(rect, 1.5, 1.5)
         if hold > 0:
             painter.setBrush(QColor(self._tick))
             pos = hold * length
-            painter.drawRect(QRectF(0, length - pos, thickness, 1.5) if vertical else QRectF(pos, 0, 1.5, thickness))
+            painter.drawRect(
+                QRectF(0, length - pos, thickness, 1.5)
+                if vertical
+                else QRectF(pos, 0, 1.5, thickness)
+            )
         painter.end()

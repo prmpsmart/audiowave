@@ -81,5 +81,5 @@ class PcmSource(QIODevice):
             want -= frames * self._bpf
         return bytes(out)
 
-    def writeData(self, data, len) -> int:  # noqa: A002 - Qt's signature
+    def writeData(self, data, len) -> int:
         return -1

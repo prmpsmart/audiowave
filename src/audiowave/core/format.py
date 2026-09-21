@@ -71,7 +71,9 @@ class AudioFormat:
         return self.bytes_per_frame * self.sample_rate
 
 
-def decode_pcm(data: bytes | bytearray | memoryview, fmt: SampleFormat, channels: int) -> np.ndarray:
+def decode_pcm(
+    data: bytes | bytearray | memoryview, fmt: SampleFormat, channels: int
+) -> np.ndarray:
     """Decode interleaved PCM bytes into a ``float32`` array of shape ``(channels, frames)``.
 
     A trailing partial frame is dropped rather than raising, so a stream cut mid-frame is still usable.

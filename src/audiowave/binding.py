@@ -7,7 +7,12 @@ from audiowave.widgets.overview import OverviewView
 from audiowave.widgets.timeline import TimelineView
 
 
-def bind_player(player: AudioPlayer, *views: TimelineView | OverviewView, sync_loop: bool = True, follow: bool = True) -> None:
+def bind_player(
+    player: AudioPlayer,
+    *views: TimelineView | OverviewView,
+    sync_loop: bool = True,
+    follow: bool = True,
+) -> None:
     """Connect a player to any number of timeline widgets.
 
     The player drives each view's playhead; clicks on a view seek the player; loops drawn on a view

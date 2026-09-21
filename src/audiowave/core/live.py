@@ -61,7 +61,8 @@ class LivePeaks:
     def tail(self, buckets: int) -> list[Peaks]:
         """The most recent ``buckets`` buckets of each channel (fewer if not yet available)."""
         return [
-            Peaks(p.minimum[-buckets:], p.maximum[-buckets:], p.rms[-buckets:]) for p in self.peaks()
+            Peaks(p.minimum[-buckets:], p.maximum[-buckets:], p.rms[-buckets:])
+            for p in self.peaks()
         ]
 
     def _channel_peaks(self, c: int) -> Peaks:

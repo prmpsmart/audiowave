@@ -56,9 +56,13 @@ def read_wav(source: WavSource) -> tuple[np.ndarray, int]:
         if chunk_id == b"fmt ":
             if size < 16:
                 raise WavError("fmt chunk too small")
-            tag, channels, rate, _byte_rate, _align, bits = struct.unpack_from("<HHIIHH", data, body)
+            tag, channels, rate, _byte_rate, _align, bits = struct.unpack_from(
+                "<HHIIHH", data, body
+            )
             if tag == _TAG_EXTENSIBLE and size >= 26:
-                (tag,) = struct.unpack_from("<H", data, body + 24)  # first 2 bytes of the sub-format GUID
+                (tag,) = struct.unpack_from(
+                    "<H", data, body + 24
+                )  # first 2 bytes of the sub-format GUID
             fmt_info = (tag, channels, rate, bits)
         elif chunk_id == b"data":
             # Streamed files may declare 0 or 0xFFFFFFFF; clamp to what is actually present.
@@ -96,7 +100,16 @@ def write_wav(
             b"RIFF",
             struct.pack("<I", 36 + len(pcm) + (len(pcm) & 1)),
             b"WAVEfmt ",
-            struct.pack("<IHHIIHH", 16, tag, channels, sample_rate, sample_rate * channels * width, channels * width, width * 8),
+            struct.pack(
+                "<IHHIIHH",
+                16,
+                tag,
+                channels,
+                sample_rate,
+                sample_rate * channels * width,
+                channels * width,
+                width * 8,
+            ),
             b"data",
             struct.pack("<I", len(pcm)),
         ]
@@ -110,7 +123,9 @@ def write_wav(
         dest.write(payload)
 
 
-def wav_bytes(samples: np.ndarray, sample_rate: int, sample_format: SampleFormat = SampleFormat.S16) -> bytes:
+def wav_bytes(
+    samples: np.ndarray, sample_rate: int, sample_format: SampleFormat = SampleFormat.S16
+) -> bytes:
     """Convenience: encode to an in-memory WAV file."""
     buffer = io.BytesIO()
     write_wav(buffer, samples, sample_rate, sample_format)

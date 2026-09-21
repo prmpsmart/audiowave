@@ -2,7 +2,14 @@ import numpy as np
 import pytest
 
 from audiowave.core import (
-    correlation, detect_silence, from_db, peak_db, rms_db, spectrogram, stereo_xy, to_db,
+    correlation,
+    detect_silence,
+    from_db,
+    peak_db,
+    rms_db,
+    spectrogram,
+    stereo_xy,
+    to_db,
 )
 
 
@@ -40,6 +47,8 @@ def test_detect_silence_finds_the_gap():
     x = np.concatenate([np.full(1000, 0.5), np.zeros(800), np.full(1000, 0.5)]).astype(np.float32)
     ranges = detect_silence(x, sr, min_duration=0.3)
     assert len(ranges) == 1
-    assert ranges[0][0] == pytest.approx(1.0, abs=0.02) and ranges[0][1] == pytest.approx(1.8, abs=0.02)
+    assert ranges[0][0] == pytest.approx(1.0, abs=0.02) and ranges[0][1] == pytest.approx(
+        1.8, abs=0.02
+    )
     assert detect_silence(x, sr, min_duration=2.0) == []
     assert detect_silence(np.zeros(0, np.float32), sr) == []

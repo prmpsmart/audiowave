@@ -22,8 +22,8 @@ from PySide6.QtGui import (
 from PySide6.QtWidgets import QWidget
 
 from audiowave.appearance import Palette
-
 from audiowave.core.annotations import Loop, Marker
+
 from .ruler import format_time, nice_step, paint_ruler, ticks
 from .viewport import Viewport
 
@@ -141,7 +141,9 @@ class TimelineView(QWidget):
 
     # -- hooks for subclasses -------------------------------------------------------------------
 
-    def paint_content(self, painter: QPainter, rect: QRectF) -> None:  # pragma: no cover - abstract hook
+    def paint_content(
+        self, painter: QPainter, rect: QRectF
+    ) -> None:  # pragma: no cover - abstract hook
         """Draw the view's own content inside ``rect`` (below the ruler)."""
 
     def paint_playhead_marks(self, painter: QPainter, x: float) -> None:
@@ -176,7 +178,9 @@ class TimelineView(QWidget):
         font = self.font()
         font.setPointSizeF(max(font.pointSizeF() - 1.5, 7.0))
         font.setFamilies([*font.families(), "Menlo", "Consolas", "monospace"])
-        paint_ruler(painter, self.ruler_rect(), self.viewport.start, self.viewport.end, self._palette, font)
+        paint_ruler(
+            painter, self.ruler_rect(), self.viewport.start, self.viewport.end, self._palette, font
+        )
 
     def _paint_overlays(self, painter: QPainter) -> None:
         top, bottom = self.ruler_rect().height(), float(self.height())
@@ -222,7 +226,9 @@ class TimelineView(QWidget):
         base = self.RULER_HEIGHT
         painter.setPen(Qt.PenStyle.NoPen)
         painter.setBrush(colour)
-        painter.drawPolygon([QPointF(x, base - 14), QPointF(x + 8, base - 10), QPointF(x, base - 6)])
+        painter.drawPolygon(
+            [QPointF(x, base - 14), QPointF(x + 8, base - 10), QPointF(x, base - 6)]
+        )
         painter.fillRect(QRectF(x - 1, base - 14, 1.5, 14), colour)
         if marker.label:
             painter.setPen(colour)
@@ -289,9 +295,13 @@ class TimelineView(QWidget):
             if abs(t - self._drag_anchor) >= _MIN_LOOP_SECONDS:
                 self._set_loop_from_drag(Loop(self._drag_anchor, t))
         elif self._drag is _Drag.LOOP_START and self._loop:
-            self._set_loop_from_drag(Loop(min(t, self._loop.end - _MIN_LOOP_SECONDS), self._loop.end))
+            self._set_loop_from_drag(
+                Loop(min(t, self._loop.end - _MIN_LOOP_SECONDS), self._loop.end)
+            )
         elif self._drag is _Drag.LOOP_END and self._loop:
-            self._set_loop_from_drag(Loop(self._loop.start, max(t, self._loop.start + _MIN_LOOP_SECONDS)))
+            self._set_loop_from_drag(
+                Loop(self._loop.start, max(t, self._loop.start + _MIN_LOOP_SECONDS))
+            )
         else:
             near_edge = self._hit_loop_edge(pos.x()) is not _Drag.NONE
             on_marker = self._marker_at(pos.x(), pos.y()) is not None
@@ -304,7 +314,9 @@ class TimelineView(QWidget):
             )
 
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:
-        if self._drag is _Drag.NEW_LOOP and (self._loop is None or self._loop.length < _MIN_LOOP_SECONDS):
+        if self._drag is _Drag.NEW_LOOP and (
+            self._loop is None or self._loop.length < _MIN_LOOP_SECONDS
+        ):
             # A click on the ruler that never became a drag is just a seek.
             self.seekRequested.emit(self._drag_anchor)
         self._drag = _Drag.NONE
@@ -321,7 +333,9 @@ class TimelineView(QWidget):
 
     def wheelEvent(self, event: QWheelEvent) -> None:
         delta = event.angleDelta()
-        zoom_modifier = event.modifiers() & (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.MetaModifier)
+        zoom_modifier = event.modifiers() & (
+            Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.MetaModifier
+        )
         if zoom_modifier and delta.y():
             self.viewport.zoom(1.2 ** (delta.y() / 120), self.x_to_time(event.position().x()))
         else:

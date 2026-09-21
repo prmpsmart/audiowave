@@ -1,6 +1,32 @@
-# AudioWave Studio — UI proposal
+# AudioWave Studio: UI proposal
 
-Status: **draft for discussion**. Nothing here is implemented yet.
+## Implementation status
+
+The proposal has been implemented as the `studio` app (see [architecture](../architecture.md)); real screenshots are in
+[`../screenshots/`](../screenshots). Where the running app differs from the mockups below:
+
+| Mockup | Built |
+|--------|-------|
+| Stream roles "Server / Client" | **Sender / Receiver.** The mockup mislabelled them: in Mimi Wave the sender is the server and the receiver is the client |
+| Stream page shows a sending lane and a receiving lane together | One lane at a time, matching the role chosen |
+| Stream "LIVE" mic lane | Implemented as *Stream microphone*, and *Send current take* covers the old "Send Recorded" |
+| "PLAYING" badge on the current take | "CURRENT" (a take can be selected while stopped) |
+| Hex values printed on colour swatches | Moved to the tooltip; the columns were too narrow |
+| Custom window controls | Native title bar |
+| RMS + Peak "faked" from the peak | Uses a real RMS envelope from the core |
+
+Built from the feature list: presets, linked/L/R editing, the style picker and Style Lab (12 renderers), spectrogram and
+vectorscope views, overview with viewport, loop region, markers, speed, mute/solo, per-channel meters, auto gain, takes,
+device pickers, PNG export, light theme, keyboard shortcuts, drag and drop.
+
+Not built yet: loudness/LUFS, live spectrum analyser, trim/cut/fade editing, multi-file compare, recent files, arrow-key
+nudge. `detect_silence` exists in `audiowave.core` but has no UI yet.
+
+---
+
+Everything below is the original proposal, kept as written. It refers to the 0.1 classes
+(`AudioWaveFormOptions` and friends), which no longer exist; see the README for the new names.
+
 Mockup source: [`mockups/studio.html`](mockups/studio.html). Regenerate the images with [`render.sh`](render.sh).
 
 ## Why
@@ -105,6 +131,7 @@ Sorted roughly by how cheaply they fit the current code. None require a new depe
 optional and only needed for the spectrogram, vectorscope, loudness and silence detection.
 
 **Small, mostly UI**
+
 - Loop region (A–B) with draggable handles on the ruler; `PlayingFixedAudioWaveForm` already owns the seek ratio.
 - Markers with names, saved next to the WAV as a small JSON sidecar.
 - Follow playhead: auto-scroll the zoomed viewport to keep the seeker visible.
@@ -117,6 +144,7 @@ optional and only needed for the spectrogram, vectorscope, loudness and silence 
 - Keyboard: Space play/pause, L loop, M marker, ←/→ nudge, +/− zoom.
 
 **Medium**
+
 - Overview minimap with a draggable viewport rectangle.
 - Takes list with auto-numbering, rename, delete, and "save all".
 - Silence detection: shade quiet stretches, offer "trim silence" on export.
@@ -125,6 +153,7 @@ optional and only needed for the spectrogram, vectorscope, loudness and silence 
 - Input / output device pickers via `QMediaDevices`.
 
 **Larger**
+
 - Non-destructive trim / cut / fade on a selection, then Save WAV.
 - Stream extras for Mimi Wave: latency, jitter buffer, dropped-frame counter, reconnect.
 - Multi-file compare: two files stacked on one shared timeline.

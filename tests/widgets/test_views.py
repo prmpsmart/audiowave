@@ -4,9 +4,14 @@ from PySide6.QtCore import QPoint, Qt
 from PySide6.QtGui import QWheelEvent
 from PySide6.QtTest import QTest
 
-from audiowave import AudioClip, Appearance, LivePeaks, Loop, Marker
+from audiowave import Appearance, AudioClip, LivePeaks, Loop, Marker
 from audiowave.widgets import (
-    LevelMeter, LiveWaveformView, OverviewView, SpectrogramView, VectorscopeView, WaveformView,
+    LevelMeter,
+    LiveWaveformView,
+    OverviewView,
+    SpectrogramView,
+    VectorscopeView,
+    WaveformView,
 )
 
 
@@ -14,7 +19,9 @@ def dark_ratio(view) -> float:
     """Fraction of pixels that are NOT the flat background colour."""
     image = view.grab().toImage()
     bg = image.pixel(1, image.height() - 2)
-    ptr = np.frombuffer(image.constBits(), np.uint32).reshape(image.height(), -1)[:, : image.width()]
+    ptr = np.frombuffer(image.constBits(), np.uint32).reshape(image.height(), -1)[
+        :, : image.width()
+    ]
     return float((ptr != bg).mean())
 
 
@@ -68,14 +75,24 @@ def test_loop_edges_can_be_dragged_and_double_click_clears(view, qtbot):
     QTest.mouseRelease(view, Qt.MouseButton.LeftButton, pos=QPoint(x_end + 60, 100))
     assert view.loop.end > 1.5 and view.loop.start == 0.5
     with qtbot.waitSignal(view.loopChanged, timeout=1000) as sig:
-        QTest.mouseDClick(view, Qt.MouseButton.LeftButton, pos=QPoint(int(view.time_to_x(1.0)), 100))
+        QTest.mouseDClick(
+            view, Qt.MouseButton.LeftButton, pos=QPoint(int(view.time_to_x(1.0)), 100)
+        )
     assert sig.args == [None] and view.loop is None
 
 
 def test_ctrl_wheel_zooms_plain_wheel_pans(view):
     def wheel(mods, dy=0, dx=0):
-        ev = QWheelEvent(view.rect().center().toPointF(), view.mapToGlobal(view.rect().center()).toPointF(),
-                         QPoint(), QPoint(dx, dy), Qt.MouseButton.NoButton, mods, Qt.ScrollPhase.NoScrollPhase, False)
+        ev = QWheelEvent(
+            view.rect().center().toPointF(),
+            view.mapToGlobal(view.rect().center()).toPointF(),
+            QPoint(),
+            QPoint(dx, dy),
+            Qt.MouseButton.NoButton,
+            mods,
+            Qt.ScrollPhase.NoScrollPhase,
+            False,
+        )
         view.wheelEvent(ev)
 
     wheel(Qt.KeyboardModifier.ControlModifier, dy=240)
@@ -100,7 +117,9 @@ def test_markers_are_sorted_and_clickable(view, qtbot):
     view.set_markers([Marker(1.5, "b"), Marker(0.5, "a")])
     assert [m.label for m in view.markers] == ["a", "b"]
     with qtbot.waitSignal(view.markerClicked, timeout=1000) as sig:
-        QTest.mouseClick(view, Qt.MouseButton.LeftButton, pos=QPoint(int(view.time_to_x(0.5)) + 1, 10))
+        QTest.mouseClick(
+            view, Qt.MouseButton.LeftButton, pos=QPoint(int(view.time_to_x(0.5)) + 1, 10)
+        )
     assert sig.args[0] == pytest.approx(0.5)
 
 

@@ -24,7 +24,10 @@ def draw_rects(painter: QPainter, rects: list[QRectF], radius: float) -> None:
 
 
 def symmetric_rects(xs, up, down, mid: float, width: float) -> list[QRectF]:
-    return [QRectF(x, mid - u, width, u + d) for x, u, d in zip(xs.tolist(), up.tolist(), down.tolist(), strict=True)]
+    return [
+        QRectF(x, mid - u, width, u + d)
+        for x, u, d in zip(xs.tolist(), up.tolist(), down.tolist(), strict=True)
+    ]
 
 
 @register
@@ -76,7 +79,9 @@ class RmsPeak(WavePainter):
         a = job.appearance
         half, mid = half_height(job), job.rect.center().y()
         xs, floor = column_x(job), a.idle_height / 2
-        outer_up, outer_down = extents(PaintJob(job.rect, job.peaks, a.with_(gravity=Gravity.MIN_MAX)))
+        outer_up, outer_down = extents(
+            PaintJob(job.rect, job.peaks, a.with_(gravity=Gravity.MIN_MAX))
+        )
         core = (job.peaks.rms.astype("float64") * half).clip(min=floor)
         radius = min(a.radius, a.bar_width / 2)
 
@@ -110,7 +115,14 @@ class Ground(WavePainter):
         radius = min(a.radius, a.bar_width / 2)
 
         painter.setBrush(color)
-        draw_rects(painter, [QRectF(x, base - h, a.bar_width, h) for x, h in zip(xs, heights.tolist(), strict=True)], radius)
+        draw_rects(
+            painter,
+            [
+                QRectF(x, base - h, a.bar_width, h)
+                for x, h in zip(xs, heights.tolist(), strict=True)
+            ],
+            radius,
+        )
 
         faded = QColor(color)
         faded.setAlphaF(color.alphaF() * 0.4)
@@ -122,6 +134,9 @@ class Ground(WavePainter):
         painter.setBrush(gradient)
         draw_rects(
             painter,
-            [QRectF(x, base + 1, a.bar_width, min(h * 0.6, reflect)) for x, h in zip(xs, heights.tolist(), strict=True)],
+            [
+                QRectF(x, base + 1, a.bar_width, min(h * 0.6, reflect))
+                for x, h in zip(xs, heights.tolist(), strict=True)
+            ],
             0,
         )

@@ -31,7 +31,11 @@ def test_write_then_read_roundtrip(sine, fmt):
 def test_reads_extensible_header():
     pcm = np.array([1000, -1000], "<i2").tobytes()
     guid = struct.pack("<H", 1) + b"\x00\x00\x00\x00\x10\x00\x80\x00\x00\xaa\x00\x38\x9b\x71"
-    fmt = struct.pack("<HHIIHH", 0xFFFE, 1, 8000, 16000, 2, 16) + struct.pack("<HHI", 22, 16, 4) + guid
+    fmt = (
+        struct.pack("<HHIIHH", 0xFFFE, 1, 8000, 16000, 2, 16)
+        + struct.pack("<HHI", 22, 16, 4)
+        + guid
+    )
     wav = b"RIFF" + struct.pack("<I", 4 + 8 + len(fmt) + 8 + len(pcm)) + b"WAVE"
     wav += b"fmt " + struct.pack("<I", len(fmt)) + fmt + b"data" + struct.pack("<I", len(pcm)) + pcm
     clip = AudioClip.from_wav(wav)
