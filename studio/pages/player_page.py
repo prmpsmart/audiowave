@@ -291,12 +291,16 @@ class PlayerPage(QWidget):
             return
         size_mb = clip.frames * clip.channels * 2 / 1_000_000
         channels = {1: "Mono", 2: "Stereo"}.get(clip.channels, f"{clip.channels} ch")
+        take = self._s.takes.current
+        source = (
+            take.path.suffix[1:].upper() if take and take.path and take.path.suffix else "Recorded"
+        )
         for c, text in zip(
             self._chips,
             (
                 f"{clip.sample_rate / 1000:g} kHz",
                 channels,
-                "PCM 16-bit",
+                source,
                 f"{clip.duration:.1f} s",
                 f"{size_mb:.1f} MB",
             ),
@@ -339,7 +343,10 @@ class PlayerPage(QWidget):
             window = clip.samples[:, max(end - int(METER_WINDOW * clip.sample_rate), 0) : end]
             self.strip.set_levels([float(np.abs(c).max()) if c.size else 0.0 for c in window])
         if self.stack.currentWidget() is self.spectrum:
-            mono = clip.samples[:, max(end - SPECTRUM_WINDOW, 0) : end].mean(axis=0)
+            start = max(
+                end - SPECTRUM_WINDOW, 0
+            )  # the window ending at the playhead; from the start if too early
+            mono = clip.samples[:, start : start + SPECTRUM_WINDOW].mean(axis=0)
             self.spectrum.feed(mono, clip.sample_rate)
 
     def _on_state(self, state: PlayerState) -> None:

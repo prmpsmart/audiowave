@@ -60,8 +60,9 @@ class ComparePanel(QWidget):
         col.addWidget(self._label_b)
         col.addWidget(self.wave_b, 1)
 
-        session.takes.added.connect(lambda _t: self.refresh())
-        session.takes.removed.connect(lambda _t: self.refresh())
+        # Only rebuild while visible: refreshing touches the shared viewport, which belongs to whichever view is showing.
+        session.takes.added.connect(lambda _t: self.isVisible() and self.refresh())
+        session.takes.removed.connect(lambda _t: self.isVisible() and self.refresh())
         session.takes.renamed.connect(lambda _t: self._update_labels())
 
     def _header(self) -> QHBoxLayout:

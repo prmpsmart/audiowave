@@ -57,6 +57,7 @@ class Session(QObject):
         self._silences: list[Loop] = []
         self._loudness: Loudness | None = None
         self._loudness_cache: dict[int, tuple[AudioClip, Loudness]] = {}
+        self._loudness_waiters: dict[int, list] = {}
         self._busy = False
         self._decoders: set[AudioDecoder] = set()
 
@@ -178,22 +179,37 @@ class Session(QObject):
             self.loudnessChanged.emit(result)
 
     def loudness_of(self, clip: AudioClip, callback) -> None:
-        """Measure ``clip`` in the background (cached) and call ``callback(Loudness)`` on the UI thread."""
-        cached = self._loudness_cache.get(id(clip))
+        """Measure ``clip`` in the background (cached) and call ``callback(Loudness)`` on the UI thread.
+
+        Concurrent requests for the same clip share one measurement and all get their callback, so
+        two parts of the UI asking at once cannot starve each other.
+        """
+        key = id(clip)
+        cached = self._loudness_cache.get(key)
         if cached is not None and cached[0] is clip:
             callback(cached[1])
             return
+        waiting = self._loudness_waiters.get(key)
+        if waiting is not None:
+            waiting.append(callback)
+            return
+        self._loudness_waiters[key] = [callback]
 
         def store(result: Loudness) -> None:
-            self._loudness_cache[id(clip)] = (
+            self._loudness_cache[key] = (
                 clip,
                 result,
             )  # holding ``clip`` keeps its id from being reused
             while len(self._loudness_cache) > _LOUDNESS_CACHE:
                 self._loudness_cache.pop(next(iter(self._loudness_cache)))
-            callback(result)
+            for waiter in self._loudness_waiters.pop(key, []):
+                waiter(result)
 
-        self.tasks.submit(f"loudness-{id(clip)}", lambda: measure(clip), store)
+        def failed(text: str) -> None:
+            self._loudness_waiters.pop(key, None)
+            self.message.emit(f"Could not measure loudness: {text}", True)
+
+        self.tasks.submit(f"loudness-{key}", lambda: measure(clip), store, failed)
 
     # -- loop / selection -----------------------------------------------------------------------
 

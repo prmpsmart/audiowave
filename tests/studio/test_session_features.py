@@ -256,3 +256,33 @@ def test_recent_files_are_unique_newest_first_capped_and_prune_missing(tmp_path)
         p.name
         for p in RecentFiles(QSettings(str(tmp_path / "r.ini"), QSettings.Format.IniFormat)).paths()
     ] == []
+
+
+# -- regression: concurrent loudness requests -----------------------------------------------------
+
+
+def test_simultaneous_loudness_requests_for_one_clip_all_get_answers(qtbot, session):
+    """Two consumers (e.g. the info chips and the compare panel) asking at once must both be answered."""
+    clip = tone_clip(8.0)
+    answers = []
+    session.loudness_of(clip, lambda result: answers.append(("first", result)))
+    session.loudness_of(
+        clip, lambda result: answers.append(("second", result))
+    )  # while the first is still running
+    qtbot.waitUntil(lambda: len(answers) == 2, timeout=15000)
+    assert [who for who, _ in answers] == ["first", "second"] and answers[0][1] is answers[1][1]
+
+
+def test_adding_a_take_does_not_disturb_the_current_take_or_its_loudness(qtbot, window):
+    """The screenshot scenario: other takes arrive while the first is still being measured."""
+    s = window._s
+    viewport_before = (s.viewport.start, s.viewport.end, s.viewport.duration)
+    s.takes.add(tone_clip(3.0), name="Extra", select=False)
+    s.takes.add(tone_clip(9.0), name="Longer", select=False)
+    qtbot.waitUntil(lambda: s.loudness is not None, timeout=15000)
+    assert (
+        s.viewport.start,
+        s.viewport.end,
+        s.viewport.duration,
+    ) == viewport_before  # untouched by hidden compare panel
+    assert "LUFS" in window.player_page._lufs_chip.text()

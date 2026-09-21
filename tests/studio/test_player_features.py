@@ -255,3 +255,10 @@ def test_record_page_shows_a_live_spectrum_of_incoming_audio(window):
     assert abs(page.spectrum.centres[int(page.spectrum.levels.argmax())] - 2000) < 300
     page._on_state(page._s.recorder.state)  # back to idle clears it
     assert (page.spectrum.levels <= -90).all()
+
+
+def test_spectrum_shows_something_even_before_the_playhead_has_audio_behind_it(window):
+    page = window.player_page
+    window._s.player.seek(0.0)
+    page.view_switch.set_current("spectrum", emit=True)
+    assert page.spectrum.levels.max() > -60  # analyses the first window instead of showing nothing
