@@ -11,6 +11,7 @@ from .analysis import (
     stereo_xy,
     to_db,
 )
+from .annotations import Loop, Marker
 from .clip import AudioClip
 from .format import AudioFormat, SampleFormat, decode_pcm, encode_pcm
 from .live import LivePeaks
@@ -22,6 +23,8 @@ __all__ = [
     "AudioFormat",
     "ClipPeaks",
     "LivePeaks",
+    "Loop",
+    "Marker",
     "PeakPyramid",
     "Peaks",
     "SampleFormat",

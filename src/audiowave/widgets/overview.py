@@ -13,7 +13,7 @@ from audiowave.appearance import Appearance
 from audiowave.core.clip import AudioClip
 from audiowave.core.peaks import ClipPeaks, Peaks
 
-from .annotations import Loop
+from audiowave.core.annotations import Loop
 from .lane import LaneRenderer
 from .viewport import Viewport
 

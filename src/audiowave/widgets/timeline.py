@@ -23,7 +23,7 @@ from PySide6.QtWidgets import QWidget
 
 from audiowave.appearance import Palette
 
-from .annotations import Loop, Marker
+from audiowave.core.annotations import Loop, Marker
 from .ruler import format_time, nice_step, paint_ruler, ticks
 from .viewport import Viewport
 

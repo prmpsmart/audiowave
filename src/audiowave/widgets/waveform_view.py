@@ -19,6 +19,14 @@ from .viewport import Viewport
 LANE_GAP = 6
 
 
+def layout_lanes(width: float, height: float, channels: int, top: float, gap: float = LANE_GAP) -> list[QRectF]:
+    """Stack ``channels`` equal lanes in ``height`` below ``top``. Shared with widgets that must line up with them."""
+    if channels <= 0:
+        return []
+    lane_h = (height - top - gap * (channels - 1)) / channels
+    return [QRectF(0, top + i * (lane_h + gap), width, lane_h) for i in range(channels)]
+
+
 class WaveformView(TimelineView):
     """One stacked lane per channel, each painted with its own :class:`Appearance`.
 
@@ -94,11 +102,7 @@ class WaveformView(TimelineView):
     def lane_rects(self) -> list[QRectF]:
         """Rectangles of the channel lanes, top to bottom."""
         n = self._clip.channels if self._clip else 0
-        if n == 0:
-            return []
-        content = self.content_rect()
-        height = (content.height() - LANE_GAP * (n - 1)) / n
-        return [QRectF(0, content.top() + i * (height + LANE_GAP), content.width(), height) for i in range(n)]
+        return layout_lanes(self.width(), self.height(), n, self.ruler_rect().height())
 
     # -- caching --------------------------------------------------------------------------------
 
