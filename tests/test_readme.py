@@ -20,16 +20,25 @@ BLOCKS = re.findall(r"<!-- readme-test -->\s*```python\n(.*?)```", README, re.S)
 
 PRELUDE = """
 import sys
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QCoreApplication, QTimer
 from PySide6.QtWidgets import QApplication
-_exec = QApplication.exec
-QApplication.exec = staticmethod(lambda *a, **k: (QTimer.singleShot(500, QApplication.instance().quit), _exec(*a, **k))[1])
+
+def _quick(original):
+    def run(*args, **kwargs):
+        QTimer.singleShot(500, QCoreApplication.instance().quit)
+        return original(*args, **kwargs)
+    return staticmethod(run)
+
+QCoreApplication.exec = _quick(QCoreApplication.exec)
+QApplication.exec = _quick(QApplication.exec)
+
 from audiowave.audio import player as _player
 _init = _player.AudioPlayer.__init__
 def _silent_init(self, *a, **k):
     _init(self, *a, **k)
     self._volume = 0.0  # the README plays audio; the test must not
 _player.AudioPlayer.__init__ = _silent_init
+_player.AudioPlayer.set_volume = lambda self, volume: None  # ...even if the example asks for volume
 """
 
 
@@ -46,6 +55,13 @@ def test_readme_example_runs(index, tmp_path):
     script.write_text(PRELUDE + BLOCKS[index])
     env = {**os.environ, "QT_QPA_PLATFORM": "offscreen"}
     result = subprocess.run(
-        [sys.executable, str(script)], cwd=tmp_path, env=env, capture_output=True, text=True, timeout=120
+        [sys.executable, str(script)],
+        cwd=tmp_path,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=120,
     )
-    assert result.returncode == 0, f"README block {index} failed:\n{BLOCKS[index]}\n{result.stderr[-1500:]}"
+    assert result.returncode == 0, (
+        f"README block {index} failed:\n{BLOCKS[index]}\n{result.stderr[-1500:]}"
+    )

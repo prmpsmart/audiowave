@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 from PySide6.QtCore import QPoint, Qt
 from PySide6.QtTest import QTest
+from studio.main import build_window
 from studio.models import Target
 from studio.theme import DARK, LIGHT, get_theme
 from studio.widgets.channel_strip import channel_gains
@@ -241,3 +242,18 @@ def test_stream_page_end_to_end_over_loopback(qtbot, window):
     remote.disconnect_from()
     page.main_button.click()  # stop server
     assert not page.sender.is_listening
+
+
+def test_files_given_on_the_command_line_replace_the_demo(qtbot, tmp_path, assets):
+    """`python -m studio song.mp3`: the file opens (MP3 asynchronously) and the demo take is not added."""
+    w = build_window(
+        presets_path=tmp_path / "p.json",
+        settings_path=tmp_path / "s.ini",
+        files=[str(assets / "test_stereo.mp3")],
+    )
+    qtbot.addWidget(w)
+    qtbot.waitUntil(lambda: len(w._s.takes) == 1, timeout=15000)
+    assert [t.name for t in w._s.takes] == [
+        "test_stereo"
+    ] and w._s.takes.current.path.suffix == ".mp3"
+    w._s.shutdown()

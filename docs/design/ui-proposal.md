@@ -15,12 +15,14 @@ The proposal has been implemented as the `studio` app (see [architecture](../arc
 | Custom window controls | Native title bar |
 | RMS + Peak "faked" from the peak | Uses a real RMS envelope from the core |
 
-Built from the feature list: presets, linked/L/R editing, the style picker and Style Lab (12 renderers), spectrogram and
-vectorscope views, overview with viewport, loop region, markers, speed, mute/solo, per-channel meters, auto gain, takes,
-device pickers, PNG export, light theme, keyboard shortcuts, drag and drop.
+Built from the feature list: presets, linked/L/R editing, the style picker and Style Lab (12 renderers), spectrogram, spectrum
+analyser and vectorscope views, overview with viewport, loop region, markers, speed, mute/solo, per-channel meters, auto gain,
+takes, device pickers, PNG export, light theme, drag and drop, **plus everything that was listed as "not built yet"**:
+loudness (LUFS, range, live momentary), a live spectrum analyser (Player and Record), trim / cut / fade / normalise editing
+with undo and redo, comparing two takes on one timeline, recent files, keyboard navigation, and silence detection with
+highlights and removal. MP3 (and other compressed formats) now opens too.
 
-Not built yet: loudness/LUFS, live spectrum analyser, trim/cut/fade editing, multi-file compare, recent files, arrow-key
-nudge. `detect_silence` exists in `audiowave.core` but has no UI yet.
+Still not built: stream latency, jitter and reconnect readouts, and MP3 export.
 
 ---
 

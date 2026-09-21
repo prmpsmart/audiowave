@@ -10,7 +10,7 @@ from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QApplication
 
 from audiowave import Appearance
-from audiowave.audio import AudioPlayer, AudioRecorder
+from audiowave.audio import AudioPlayer, AudioRecorder, is_supported
 from studio.demo import demo_clip
 from studio.main_window import MainWindow
 from studio.models import AppearanceModel, PresetStore, RecentFiles, TakesModel
@@ -51,9 +51,10 @@ def build_window(
     window = MainWindow(session, fonts, theme)
     session.setParent(window)
 
-    opened = [session.open_file(path) for path in (files or [])]
-    if not any(opened) and demo:
-        takes.add(demo_clip(), name="Demo")
+    for path in files or []:
+        session.open_file(path)  # WAV opens at once; MP3 and friends decode in the background
+    if not files and demo:
+        takes.add(demo_clip(), name="Demo")  # only when nothing was asked for
     return window
 
 
@@ -62,6 +63,6 @@ def main(argv: list[str] | None = None) -> int:
     QCoreApplication.setOrganizationName("PRMPSmart")
     QCoreApplication.setApplicationName("AudioWave")
     app = QApplication(argv)
-    window = build_window(files=[a for a in argv[1:] if a.lower().endswith(".wav")])
+    window = build_window(files=[a for a in argv[1:] if is_supported(a)])
     window.show()
     return app.exec()

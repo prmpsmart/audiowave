@@ -10,16 +10,19 @@
 
 ```
 src/audiowave/
-  core/          numpy only. AudioClip, wavio, format, peaks (pyramid), live peaks, analysis, annotations
+  core/          numpy only. AudioClip, wavio, format, peaks (pyramid), live peaks, analysis (spectrogram, bands,
+                 stereo, silence), loudness (BS.1770), edit (cut/fade/normalise/...), annotations
   appearance.py  Appearance, Palette, Gravity: immutable, JSON-serialisable, Qt-free
-  audio/         QtMultimedia. AudioPlayer, AudioRecorder, PcmSource, devices, permissions
+  audio/         QtMultimedia. AudioPlayer, AudioRecorder, AudioDecoder (mp3 & co), PcmSource, devices, permissions
   widgets/       QtWidgets. TimelineView -> WaveformView / SpectrogramView; OverviewView, LiveWaveformView,
-                 VectorscopeView, LevelMeter; painters/ (one class per style); LaneRenderer; Viewport; ruler
+                 VectorscopeView, SpectrumView, LevelMeter; painters/ (one class per style); LaneRenderer; Viewport; ruler
   binding.py     bind_player(): the only place a player is connected to views
 studio/          the demo app
   main.py        composition root: builds every concrete object and wires them together
-  session.py     shared state and services (player, recorder, takes, loop, markers, viewport)
-  models/        AppearanceModel, TakesModel, PresetStore: state with no widgets
+  session.py     shared state and services (player, recorder, takes, loop, markers, silences, loudness, edits, viewport)
+  editing.py     maps UI edit actions to library operations and their preconditions (pure, testable)
+  tasks.py       BackgroundTasks: run pure work off the UI thread, deliver on it, drop superseded results
+  models/        AppearanceModel, TakesModel (with undo history), PresetStore, RecentFiles: state with no widgets
   pages/         Player, Record, Stream, Style Lab: one widget per mode
   stream/        protocol, StreamSender, StreamReceiver, FrameLogModel (TCP, Qt sockets)
   widgets/       UI kit (segmented control, sliders, toggle...), transport, takes strip, style picker
@@ -50,6 +53,26 @@ in `core` precisely so `audio` can use them without importing widgets.
 | **Dependency inversion** | Pages receive a `Session` rather than constructing services; `main.build_window` is the only place concrete classes are chosen, so tests inject a temp preset path and a silent player |
 | **DRY** | `extents()` and `column_x()` are the shared geometry of every bar-like style; `layout_lanes()` is used by both the waveform and the channel strip so they line up; `TimelineView` is written once for the waveform and the spectrogram; `paint_preview` draws inspector thumbnails, Style Lab tiles and takes from the same painters |
 | **Immutability** | `AudioClip` and `Appearance` are immutable, so caches keyed on them cannot go stale and changing one channel's look is `appearance.with_(...)` |
+
+## Formats and decoding
+
+WAV is read by the Qt-free core (`wavio`), which handles float and extensible headers that the standard `wave` module cannot.
+Everything else goes through `AudioDecoder`, a thin wrapper over Qt's FFmpeg-backed `QAudioDecoder`: no extra dependency and
+any codec the platform build supports. It decodes asynchronously with progress and cancellation, and `Session.open_file` falls
+back to it for WAV variants the core does not understand.
+
+## Loudness and editing
+
+`core/loudness.py` implements ITU-R BS.1770-4: K-weighting, 400 ms blocks with 75 % overlap, absolute and relative gating,
+and loudness range. K-weighting is an IIR filter; running it sample by sample in Python is far too slow, so its impulse
+response (which dies away in milliseconds) is truncated and applied by block FFT convolution. It is validated against values
+that follow from the standard itself (a 997 Hz stereo sine at -20 dBFS reads -20.0 LUFS; mono reads 3 LU lower) at four sample
+rates, rather than against another implementation.
+
+`core/edit.py` is a set of pure functions from clip to clip. Undo therefore costs nothing conceptually: Studio's `TakesModel`
+keeps the previous clips (bounded to 10, since each is a full copy). Edits and loudness run on `BackgroundTasks`; results for a
+clip that has since been replaced are dropped, and concurrent requests for the same clip share one measurement so no caller is
+left waiting.
 
 ## Rendering
 
@@ -90,10 +113,11 @@ teardown, which segfaulted a test run.
 |------|-----|
 | core | pure numpy tests: codec round trips for every sample format, peak pyramid vs brute force, extreme values surviving every zoom |
 | painters and widgets | render to `QImage` and count pixels; real mouse and wheel events through `QTest`; the whole registry is exercised |
+| decoding | a real MP3 (encoded once with LAME from the stereo test WAV and kept in `tests/assets`) is decoded and matched against the WAV it came from, allowing for the encoder's known delay |
 | audio | `PcmSource` unit tests (frame alignment, gapless loop); the player runs on the real output device at volume 0 |
 | streaming | protocol fuzzing by chunk size, then a real loopback socket transferring a clip |
 | app | the assembled window: page switching, shortcuts, theme swap, appearance edits reaching lanes, loop/marker/zoom wiring, end-to-end send over loopback |
-| examples | executed in subprocesses |
+| examples and README | executed in subprocesses; every code block in the README marked as testable is run, silently |
 
 ## Extending
 
