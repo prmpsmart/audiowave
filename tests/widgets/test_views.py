@@ -118,7 +118,9 @@ def test_markers_are_sorted_and_clickable(view, qtbot):
     assert [m.label for m in view.markers] == ["a", "b"]
     with qtbot.waitSignal(view.markerClicked, timeout=1000) as sig:
         QTest.mouseClick(
-            view, Qt.MouseButton.LeftButton, pos=QPoint(int(view.time_to_x(0.5)) + 1, 10)
+            view,
+            Qt.MouseButton.LeftButton,
+            pos=QPoint(int(view.time_to_x(0.5)) + 1, 10),
         )
     assert sig.args[0] == pytest.approx(0.5)
 

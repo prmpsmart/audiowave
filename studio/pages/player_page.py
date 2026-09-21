@@ -22,7 +22,13 @@ from audiowave import AudioClip, Loop, Marker
 from audiowave.audio import PlayerState
 from audiowave.binding import bind_player
 from audiowave.core import to_db
-from audiowave.widgets import OverviewView, SpectrogramView, VectorscopeView, Viewport, WaveformView
+from audiowave.widgets import (
+    OverviewView,
+    SpectrogramView,
+    VectorscopeView,
+    Viewport,
+    WaveformView,
+)
 from studio.session import Session
 from studio.theme import get_theme, icon
 from studio.widgets import Segmented, chip
@@ -78,7 +84,11 @@ class PlayerPage(QWidget):
             row.addWidget(c)
         row.addStretch()
         self.view_switch = Segmented(
-            [("waveform", "Waveform"), ("spectrogram", "Spectrogram"), ("scope", "Scope")]
+            [
+                ("waveform", "Waveform"),
+                ("spectrogram", "Spectrogram"),
+                ("scope", "Scope"),
+            ]
         )
         self.view_switch.setFixedWidth(270)
         row.addWidget(self.view_switch)
@@ -137,7 +147,12 @@ class PlayerPage(QWidget):
         player = s.player
 
         bind_player(
-            player, self.waveform, self.spectrogram, self.overview, sync_loop=False, follow=False
+            player,
+            self.waveform,
+            self.spectrogram,
+            self.overview,
+            sync_loop=False,
+            follow=False,
         )
         player.positionChanged.connect(self.scope.set_position)
         player.positionChanged.connect(self._on_position)

@@ -10,7 +10,13 @@ from studio.stream import (
     StreamSender,
     valid_port,
 )
-from studio.stream.protocol import encode_end, encode_frame, encode_hello, parse_hello, split_pcm
+from studio.stream.protocol import (
+    encode_end,
+    encode_frame,
+    encode_hello,
+    parse_hello,
+    split_pcm,
+)
 
 from audiowave import AudioClip, AudioFormat, SampleFormat
 
@@ -58,7 +64,11 @@ def test_decoder_rejects_garbage():
 def test_hello_roundtrip_and_validation():
     fmt = parse_hello(FrameDecoder().feed(encode_hello(48000, 2))[0].payload)
     assert fmt == AudioFormat(48000, 2, SampleFormat.S16)
-    for bad in (b"not json", b'{"rate": 1}', b'{"rate": 8000, "channels": 1, "format": "f32"}'):
+    for bad in (
+        b"not json",
+        b'{"rate": 1}',
+        b'{"rate": 8000, "channels": 1, "format": "f32"}',
+    ):
         with pytest.raises(ProtocolError):
             parse_hello(bad)
 
@@ -107,7 +117,8 @@ def test_a_clip_arrives_intact(qtbot, link):
     sender, receiver = link
     n = 8000 * 2
     clip = AudioClip(
-        np.stack([np.sin(np.linspace(0, 400, n)), np.cos(np.linspace(0, 300, n))]) * 0.5, 8000
+        np.stack([np.sin(np.linspace(0, 400, n)), np.cos(np.linspace(0, 300, n))]) * 0.5,
+        8000,
     )
     with qtbot.waitSignal(receiver.streamEnded, timeout=5000):
         sender.send_clip(clip)

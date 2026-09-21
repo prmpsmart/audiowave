@@ -124,7 +124,9 @@ def write_wav(
 
 
 def wav_bytes(
-    samples: np.ndarray, sample_rate: int, sample_format: SampleFormat = SampleFormat.S16
+    samples: np.ndarray,
+    sample_rate: int,
+    sample_format: SampleFormat = SampleFormat.S16,
 ) -> bytes:
     """Convenience: encode to an in-memory WAV file."""
     buffer = io.BytesIO()

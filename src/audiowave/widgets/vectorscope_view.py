@@ -79,7 +79,12 @@ class VectorscopeView(QWidget):
             xs, ys = centre.x() + x * radius, centre.y() - y * radius
             chunk = max(len(xs) // _BATCHES, 1)
             painter.setPen(
-                QPen(QColor(palette.played), 2.2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap)
+                QPen(
+                    QColor(palette.played),
+                    2.2,
+                    Qt.PenStyle.SolidLine,
+                    Qt.PenCapStyle.RoundCap,
+                )
             )
             for b in range(_BATCHES):
                 part = slice(b * chunk, None if b == _BATCHES - 1 else (b + 1) * chunk)

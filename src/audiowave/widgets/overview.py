@@ -85,7 +85,8 @@ class OverviewView(QWidget):
 
     def _t(self, x: float) -> float:
         return min(
-            max(x / max(self.width(), 1) * self.viewport.duration, 0.0), self.viewport.duration
+            max(x / max(self.width(), 1) * self.viewport.duration, 0.0),
+            self.viewport.duration,
         )
 
     def _window(self) -> QRectF:
@@ -121,7 +122,8 @@ class OverviewView(QWidget):
         shade.setAlpha(150)
         painter.fillRect(QRectF(0, 0, window.left(), self.height()), shade)
         painter.fillRect(
-            QRectF(window.right(), 0, self.width() - window.right(), self.height()), shade
+            QRectF(window.right(), 0, self.width() - window.right(), self.height()),
+            shade,
         )
 
         accent = QColor(palette.played)
@@ -135,12 +137,18 @@ class OverviewView(QWidget):
 
         if self._loop is not None:
             painter.fillRect(
-                QRectF(self._x(self._loop.start), self.height() - 3, self._x(self._loop.length), 3),
+                QRectF(
+                    self._x(self._loop.start),
+                    self.height() - 3,
+                    self._x(self._loop.length),
+                    3,
+                ),
                 QColor(palette.loop),
             )
         painter.setPen(QPen(QColor(palette.playhead), 1.5))
         painter.drawLine(
-            QPointF(self._x(self._position), 0), QPointF(self._x(self._position), self.height())
+            QPointF(self._x(self._position), 0),
+            QPointF(self._x(self._position), self.height()),
         )
         painter.end()
 
@@ -195,9 +203,11 @@ class OverviewView(QWidget):
             self.setCursor(
                 Qt.CursorShape.SizeHorCursor
                 if hit in (_Grab.LEFT, _Grab.RIGHT)
-                else Qt.CursorShape.OpenHandCursor
-                if hit is _Grab.MOVE
-                else Qt.CursorShape.ArrowCursor
+                else (
+                    Qt.CursorShape.OpenHandCursor
+                    if hit is _Grab.MOVE
+                    else Qt.CursorShape.ArrowCursor
+                )
             )
 
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:

@@ -71,7 +71,11 @@ def test_clip_peaks_time_query(stereo):
 
 
 def test_peaks_helpers():
-    p = Peaks(np.array([-1, -2], np.float32), np.array([3, 4], np.float32), np.zeros(2, np.float32))
+    p = Peaks(
+        np.array([-1, -2], np.float32),
+        np.array([3, 4], np.float32),
+        np.zeros(2, np.float32),
+    )
     assert list(p.amplitude) == [2.0, 3.0]
     assert len(Peaks.concatenate([p, p])) == 4 and len(Peaks.concatenate([])) == 0
 

@@ -3,7 +3,15 @@
 from __future__ import annotations
 
 from PySide6.QtCore import QSize, Qt, Signal
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QMenu, QToolButton, QVBoxLayout, QWidget
+from PySide6.QtWidgets import (
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QMenu,
+    QToolButton,
+    QVBoxLayout,
+    QWidget,
+)
 
 from studio.theme import get_theme
 
@@ -119,10 +127,22 @@ class TransportBar(QFrame):
             tooltip="Loop the selected region (drag on the ruler to select)",
         )
         self.marker = IconButton(
-            "flag", kind="small", size=34, icon_size=15, tooltip="Add marker at playhead (M)"
+            "flag",
+            kind="small",
+            size=34,
+            icon_size=15,
+            tooltip="Add marker at playhead (M)",
         )
         self.speed = SpeedButton()
-        for w in (self.back, self.record, self.play, self.stop, self.loop, self.marker, self.speed):
+        for w in (
+            self.back,
+            self.record,
+            self.play,
+            self.stop,
+            self.loop,
+            self.marker,
+            self.speed,
+        ):
             row.addWidget(w)
         return row
 

@@ -6,7 +6,13 @@ from enum import Enum
 
 import numpy as np
 from PySide6.QtCore import QObject, QTimer, Signal
-from PySide6.QtMultimedia import QAudio, QAudioDevice, QAudioFormat, QAudioSink, QMediaDevices
+from PySide6.QtMultimedia import (
+    QAudio,
+    QAudioDevice,
+    QAudioFormat,
+    QAudioSink,
+    QMediaDevices,
+)
 
 from audiowave.core.annotations import Loop
 from audiowave.core.clip import AudioClip

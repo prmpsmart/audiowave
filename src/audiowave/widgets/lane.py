@@ -46,7 +46,13 @@ class LaneRenderer:
             draw_played = self._direct(style, rect, peaks, resolved, resolved.palette.played)
         else:
             dpr = painter.device().devicePixelRatioF()
-            key = (token, round(rect.width(), 2), round(rect.height(), 2), resolved, dpr)
+            key = (
+                token,
+                round(rect.width(), 2),
+                round(rect.height(), 2),
+                resolved,
+                dpr,
+            )
             if key != self._key:
                 self._layers = (
                     self._render(style, rect, peaks, resolved, resolved.palette.unplayed, dpr),
@@ -58,7 +64,12 @@ class LaneRenderer:
             draw_played = lambda p: p.drawPixmap(rect.topLeft(), played_pm)  # noqa: E731
 
         self._composite(
-            painter, rect, style.played_region(rect, progress), progress, draw_unplayed, draw_played
+            painter,
+            rect,
+            style.played_region(rect, progress),
+            progress,
+            draw_unplayed,
+            draw_played,
         )
 
     # -- internals ------------------------------------------------------------------------------
@@ -78,14 +89,20 @@ class LaneRenderer:
         p = QPainter(pixmap)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         style.paint(
-            p, PaintJob(QRectF(0, 0, rect.width(), rect.height()), peaks, appearance), QColor(color)
+            p,
+            PaintJob(QRectF(0, 0, rect.width(), rect.height()), peaks, appearance),
+            QColor(color),
         )
         p.end()
         return pixmap
 
     @staticmethod
     def _direct(
-        style: WavePainter, rect: QRectF, peaks: Peaks, appearance: Appearance, color: str
+        style: WavePainter,
+        rect: QRectF,
+        peaks: Peaks,
+        appearance: Appearance,
+        color: str,
     ) -> Callable[[QPainter], None]:
         def draw(p: QPainter) -> None:
             p.save()
@@ -111,7 +128,12 @@ class LaneRenderer:
             draw_unplayed(painter)
         elif isinstance(region, QRectF):
             painter.setClipRect(
-                QRectF(region.right(), rect.top(), rect.right() - region.right(), rect.height())
+                QRectF(
+                    region.right(),
+                    rect.top(),
+                    rect.right() - region.right(),
+                    rect.height(),
+                )
             )
             draw_unplayed(painter)
             painter.setClipRect(region)

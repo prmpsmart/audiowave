@@ -36,7 +36,10 @@ def demo_clip(seconds: float = 8.0, sample_rate: int = 22050) -> AudioClip:
 
 
 def demo_peaks(
-    buckets: int, clip: AudioClip | None = None, start: float = 0.0, stop: float | None = None
+    buckets: int,
+    clip: AudioClip | None = None,
+    start: float = 0.0,
+    stop: float | None = None,
 ) -> Peaks:
     """Envelope of the demo (or given) clip's first channel, for thumbnails and previews."""
     clip = clip or demo_clip()

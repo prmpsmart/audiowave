@@ -54,7 +54,10 @@ class _Thumb(QAbstractButton):
         p = QPainter(self)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setPen(
-            QPen(QColor(t.accent if self.isChecked() else t.line), 1.5 if self.isChecked() else 1)
+            QPen(
+                QColor(t.accent if self.isChecked() else t.line),
+                1.5 if self.isChecked() else 1,
+            )
         )
         p.setBrush(QColor(t.bg))
         p.drawRoundedRect(QRectF(0.75, 0.75, self.width() - 1.5, self.height() - 1.5), 8, 8)

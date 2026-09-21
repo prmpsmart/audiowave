@@ -35,7 +35,11 @@ def test_example_runs_and_exits_cleanly(module, args):
     code = RUNNER.format(examples=str(ROOT / "examples"), module=module, args=args)
     env = {**os.environ, "QT_QPA_PLATFORM": "offscreen"}
     result = subprocess.run(
-        [sys.executable, "-c", code], env=env, capture_output=True, text=True, timeout=60
+        [sys.executable, "-c", code],
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=60,
     )
     assert result.returncode == 0, result.stderr[-800:]
     assert "Traceback" not in result.stderr

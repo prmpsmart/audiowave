@@ -3,7 +3,14 @@
 from .level_meter import LevelMeter
 from .live_waveform import LiveWaveformView
 from .overview import OverviewView
-from .painters import PaintJob, WavePainter, get_painter, painter_names, painters, register
+from .painters import (
+    PaintJob,
+    WavePainter,
+    get_painter,
+    painter_names,
+    painters,
+    register,
+)
 from .spectrogram_view import SpectrogramView
 from .timeline import TimelineView
 from .vectorscope_view import VectorscopeView

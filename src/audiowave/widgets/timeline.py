@@ -179,7 +179,12 @@ class TimelineView(QWidget):
         font.setPointSizeF(max(font.pointSizeF() - 1.5, 7.0))
         font.setFamilies([*font.families(), "Menlo", "Consolas", "monospace"])
         paint_ruler(
-            painter, self.ruler_rect(), self.viewport.start, self.viewport.end, self._palette, font
+            painter,
+            self.ruler_rect(),
+            self.viewport.start,
+            self.viewport.end,
+            self._palette,
+            font,
         )
 
     def _paint_overlays(self, painter: QPainter) -> None:
@@ -308,9 +313,9 @@ class TimelineView(QWidget):
             self.setCursor(
                 Qt.CursorShape.SizeHorCursor
                 if near_edge
-                else Qt.CursorShape.PointingHandCursor
-                if on_marker
-                else Qt.CursorShape.ArrowCursor
+                else (
+                    Qt.CursorShape.PointingHandCursor if on_marker else Qt.CursorShape.ArrowCursor
+                )
             )
 
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:

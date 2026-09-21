@@ -25,7 +25,15 @@ from studio.pages.player_page import PlayerPage
 from studio.pages.record_page import RecordPage
 from studio.pages.stream_page import StreamPage
 from studio.session import Session
-from studio.theme import DARK, LIGHT, Fonts, Theme, build_stylesheet, get_theme, set_theme
+from studio.theme import (
+    DARK,
+    LIGHT,
+    Fonts,
+    Theme,
+    build_stylesheet,
+    get_theme,
+    set_theme,
+)
 from studio.widgets import IconButton, Segmented, set_property
 
 PAGES = ["record", "player", "stream", "styles"]
@@ -56,7 +64,12 @@ class MainWindow(QMainWindow):
         self.player_page = PlayerPage(session)
         self.stream_page = StreamPage(session)
         self.lab_page = LabPage(session)
-        for page in (self.record_page, self.player_page, self.stream_page, self.lab_page):
+        for page in (
+            self.record_page,
+            self.player_page,
+            self.stream_page,
+            self.lab_page,
+        ):
             self.stack.addWidget(page)
         self.inspector = Inspector(session.appearance, session.presets)
         body.addWidget(self.stack, 1)
@@ -238,7 +251,12 @@ class MainWindow(QMainWindow):
         for button in self.findChildren(IconButton):
             button.refresh(theme)
         self.tabs.refresh_icons()
-        for page in (self.record_page, self.player_page, self.stream_page, self.lab_page):
+        for page in (
+            self.record_page,
+            self.player_page,
+            self.stream_page,
+            self.lab_page,
+        ):
             page.refresh_theme()
         self.inspector.refresh()
 

@@ -14,7 +14,10 @@ _ICONS: dict[str, tuple[str, bool]] = {
     "pause": ("M7 5h3.5v14H7zM13.5 5H17v14h-3.5z", True),
     "stop": ("M6 6h12v12H6z", True),
     "rec": ("M12 5.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13z", True),
-    "loop": ("M17 2l3 3-3 3M20 5H8a4 4 0 0 0-4 4v1M7 22l-3-3 3-3M4 19h12a4 4 0 0 0 4-4v-1", False),
+    "loop": (
+        "M17 2l3 3-3 3M20 5H8a4 4 0 0 0-4 4v1M7 22l-3-3 3-3M4 19h12a4 4 0 0 0 4-4v-1",
+        False,
+    ),
     "back": ("M6 5v14M19 5L9 12l10 7z", False),
     "vol": ("M4 9v6h4l5 4V5L8 9zM16.5 8.5a5 5 0 0 1 0 7", False),
     "save": ("M12 4v11M7 11l5 5 5-5M5 20h14", False),
@@ -28,7 +31,10 @@ _ICONS: dict[str, tuple[str, bool]] = {
         "M10 14a4 4 0 0 0 5.6 0l3-3a4 4 0 0 0-5.6-5.6l-1 1M14 10a4 4 0 0 0-5.6 0l-3 3a4 4 0 0 0 5.6 5.6l1-1",
         False,
     ),
-    "net": ("M3 9a14 14 0 0 1 18 0M6 12.5a9 9 0 0 1 12 0M9 16a4 4 0 0 1 6 0M12 19.5h.01", False),
+    "net": (
+        "M3 9a14 14 0 0 1 18 0M6 12.5a9 9 0 0 1 12 0M9 16a4 4 0 0 1 6 0M12 19.5h.01",
+        False,
+    ),
     "flag": ("M6 21V4M6 5h11l-2 4 2 4H6", False),
     "lab": ("M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3M8 15h8", False),
     "sun": (

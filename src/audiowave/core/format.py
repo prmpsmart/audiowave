@@ -45,7 +45,12 @@ _WIDTHS = {
     SampleFormat.S32: 4,
     SampleFormat.F32: 4,
 }
-_BY_WIDTH = {1: SampleFormat.U8, 2: SampleFormat.S16, 3: SampleFormat.S24, 4: SampleFormat.S32}
+_BY_WIDTH = {
+    1: SampleFormat.U8,
+    2: SampleFormat.S16,
+    3: SampleFormat.S24,
+    4: SampleFormat.S32,
+}
 
 
 @dataclass(frozen=True)

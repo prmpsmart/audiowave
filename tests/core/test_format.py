@@ -40,7 +40,9 @@ def test_partial_trailing_frame_is_dropped():
 
 def test_encode_clips_out_of_range():
     out = decode_pcm(
-        encode_pcm(np.array([[2.0, -2.0]], np.float32), SampleFormat.S16), SampleFormat.S16, 1
+        encode_pcm(np.array([[2.0, -2.0]], np.float32), SampleFormat.S16),
+        SampleFormat.S16,
+        1,
     )
     assert out[0, 0] == pytest.approx(1.0, abs=1e-3) and out[0, 1] == pytest.approx(-1.0, abs=1e-3)
 

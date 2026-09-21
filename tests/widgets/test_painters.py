@@ -5,7 +5,13 @@ from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath
 
 from audiowave import Appearance, Gravity
 from audiowave.core import Peaks
-from audiowave.widgets import PaintJob, WavePainter, get_painter, painter_names, register
+from audiowave.widgets import (
+    PaintJob,
+    WavePainter,
+    get_painter,
+    painter_names,
+    register,
+)
 from audiowave.widgets.lane import LaneRenderer
 
 W, H = 240, 90
@@ -14,7 +20,11 @@ W, H = 240, 90
 def make_peaks(n: int) -> Peaks:
     t = np.linspace(0, 6 * np.pi, n)
     amp = np.abs(np.sin(t)) * 0.8 + 0.05
-    return Peaks((-amp).astype(np.float32), amp.astype(np.float32), (amp * 0.6).astype(np.float32))
+    return Peaks(
+        (-amp).astype(np.float32),
+        amp.astype(np.float32),
+        (amp * 0.6).astype(np.float32),
+    )
 
 
 def render(style: str, appearance: Appearance | None = None) -> QImage:

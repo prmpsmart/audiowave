@@ -23,7 +23,10 @@ class PresetStore:
             return None
         try:
             return Appearance.from_dict(data)
-        except (TypeError, ValueError):  # e.g. an unknown gravity value written by a newer version
+        except (
+            TypeError,
+            ValueError,
+        ):  # e.g. an unknown gravity value written by a newer version
             return None
 
     def save(self, name: str, appearance: Appearance) -> None:

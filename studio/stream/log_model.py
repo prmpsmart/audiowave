@@ -37,7 +37,10 @@ class FrameLogModel(QAbstractTableModel):
         return 0 if parent.isValid() else len(COLUMNS)
 
     def headerData(
-        self, section: int, orientation: Qt.Orientation, role: int = Qt.ItemDataRole.DisplayRole
+        self,
+        section: int,
+        orientation: Qt.Orientation,
+        role: int = Qt.ItemDataRole.DisplayRole,
     ):
         if role == Qt.ItemDataRole.DisplayRole and orientation is Qt.Orientation.Horizontal:
             return COLUMNS[section].upper()
@@ -50,7 +53,10 @@ class FrameLogModel(QAbstractTableModel):
         if role == LEVEL_ROLE:
             return level
         if role == Qt.ItemDataRole.DisplayRole:
-            return (f"#{frame + 1}", f"{size:,} B", f"{int(time // 60):02d}:{time % 60:05.2f}", "")[
-                index.column()
-            ]
+            return (
+                f"#{frame + 1}",
+                f"{size:,} B",
+                f"{int(time // 60):02d}:{time % 60:05.2f}",
+                "",
+            )[index.column()]
         return None

@@ -32,7 +32,12 @@ _COLOR_FIELDS = [
     ("loop", "Loop"),
     ("grid", "Grid"),
 ]
-_GRAVITY = [("average", "Average"), ("min_max", "Min·Max"), ("min", "Min"), ("max", "Max")]
+_GRAVITY = [
+    ("average", "Average"),
+    ("min_max", "Min·Max"),
+    ("min", "Min"),
+    ("max", "Max"),
+]
 
 
 class Inspector(QFrame):
@@ -41,7 +46,10 @@ class Inspector(QFrame):
     openStyleLab = Signal()
 
     def __init__(
-        self, model: AppearanceModel, presets: PresetStore, parent: QWidget | None = None
+        self,
+        model: AppearanceModel,
+        presets: PresetStore,
+        parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
         self.setObjectName("inspector")
@@ -132,7 +140,14 @@ class Inspector(QFrame):
         return section
 
     def _slider(
-        self, section: Section, label: str, field: str, lo: float, hi: float, step: float, fmt
+        self,
+        section: Section,
+        label: str,
+        field: str,
+        lo: float,
+        hi: float,
+        step: float,
+        fmt,
     ) -> LabeledSlider:
         slider = LabeledSlider(label, lo, hi, step, fmt)
         slider.valueChanged.connect(lambda v, f=field: self._model.update(**{f: v}))

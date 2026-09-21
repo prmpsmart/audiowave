@@ -85,7 +85,12 @@ class Radial(WavePainter):
         painter.save()
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         painter.setPen(
-            QPen(color, max(a.bar_width * 0.8, 1.6), Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap)
+            QPen(
+                color,
+                max(a.bar_width * 0.8, 1.6),
+                Qt.PenStyle.SolidLine,
+                Qt.PenCapStyle.RoundCap,
+            )
         )
         painter.drawLines(lines)
         ring = QColor(color)

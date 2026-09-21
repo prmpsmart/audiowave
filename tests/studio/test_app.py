@@ -153,7 +153,8 @@ def test_transport_drives_the_player_and_the_playhead(qtbot, window):
     s, page = window._s, window.player_page
     page.transport.play.click()
     qtbot.waitUntil(
-        lambda: s.player.state is PlayerState.PLAYING and s.player.position > 0.05, timeout=4000
+        lambda: s.player.state is PlayerState.PLAYING and s.player.position > 0.05,
+        timeout=4000,
     )
     assert page.transport.play.property("kind") == "play"
     assert page.waveform.position == pytest.approx(s.player.position, abs=0.2)
@@ -239,7 +240,8 @@ def test_stream_page_end_to_end_over_loopback(qtbot, window):
     remote = StreamReceiver()
     remote.connect_to("127.0.0.1", 6543)
     qtbot.waitUntil(
-        lambda: page.sender.client_count == 1 and page.send_button.isEnabled(), timeout=3000
+        lambda: page.sender.client_count == 1 and page.send_button.isEnabled(),
+        timeout=3000,
     )
     with qtbot.waitSignal(remote.streamEnded, timeout=8000):
         page.send_button.click()

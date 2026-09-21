@@ -37,9 +37,21 @@ class ChannelStrip(QWidget):
         self._meters: list[LevelMeter] = []
 
     def set_channels(self, count: int) -> None:
-        for widget in [*self._labels, *self._subs, *self._mutes, *self._solos, *self._meters]:
+        for widget in [
+            *self._labels,
+            *self._subs,
+            *self._mutes,
+            *self._solos,
+            *self._meters,
+        ]:
             widget.deleteLater()
-        self._labels, self._subs, self._mutes, self._solos, self._meters = [], [], [], [], []
+        self._labels, self._subs, self._mutes, self._solos, self._meters = (
+            [],
+            [],
+            [],
+            [],
+            [],
+        )
         self._channels = count
         for i in range(count):
             name = CHANNEL_NAMES[i] if count == 2 and i < 2 else str(i + 1)

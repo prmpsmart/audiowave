@@ -47,7 +47,10 @@ class _LevelDelegate(QStyledItemDelegate):
         level = float(index.data(LEVEL_ROLE) or 0)
         rect = QRectF(option.rect).adjusted(6, 0, -6, 0)
         bar = QRectF(
-            rect.left(), rect.center().y() - 2.5, max(rect.width() * min(level, 1.0), 2), 5
+            rect.left(),
+            rect.center().y() - 2.5,
+            max(rect.width() * min(level, 1.0), 2),
+            5,
         )
         painter.save()
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
@@ -372,7 +375,8 @@ class StreamPage(QWidget):
     def _begin_live(self, sample_rate: int, channels: int) -> None:
         self._rate = sample_rate
         spb = max(
-            int(sample_rate * VISIBLE_SECONDS / max(self.live_view.buckets_for_width(), 1)), 64
+            int(sample_rate * VISIBLE_SECONDS / max(self.live_view.buckets_for_width(), 1)),
+            64,
         )
         self._live = LivePeaks(channels, spb)
         self.live_view.set_source(self._live)

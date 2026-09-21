@@ -114,7 +114,9 @@ class SpectrogramView(TimelineView):
             ):  # labels closer than a line would collide
                 painter.setPen(QColor(255, 255, 255, 170))
                 painter.drawText(
-                    rect.left() + 6, int(y) - 3, f"{hz // 1000}k" if hz >= 1000 else str(hz)
+                    rect.left() + 6,
+                    int(y) - 3,
+                    f"{hz // 1000}k" if hz >= 1000 else str(hz),
                 )
                 last_label_y = y
         painter.setPen(Qt.PenStyle.NoPen)

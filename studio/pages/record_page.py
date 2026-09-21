@@ -140,7 +140,8 @@ class RecordPage(QWidget):
     def _start_after_permission(self, granted: bool) -> None:
         if not granted:
             self._s.message.emit(
-                "Microphone access was denied. Allow it in System Settings → Privacy.", True
+                "Microphone access was denied. Allow it in System Settings → Privacy.",
+                True,
             )
             return
         device = self._s.input_device.native if self._s.input_device else None

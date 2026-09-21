@@ -6,9 +6,21 @@ from dataclasses import dataclass
 
 from PySide6.QtCore import QRectF, Qt
 from PySide6.QtGui import QColor, QMouseEvent, QPainter, QPaintEvent, QPen
-from PySide6.QtWidgets import QFrame, QGridLayout, QHBoxLayout, QLabel, QVBoxLayout, QWidget
+from PySide6.QtWidgets import (
+    QFrame,
+    QGridLayout,
+    QHBoxLayout,
+    QLabel,
+    QVBoxLayout,
+    QWidget,
+)
 
-from audiowave.widgets import SpectrogramView, VectorscopeView, get_painter, painter_names
+from audiowave.widgets import (
+    SpectrogramView,
+    VectorscopeView,
+    get_painter,
+    painter_names,
+)
 from studio.demo import demo_clip
 from studio.models import AppearanceModel
 from studio.session import Session
@@ -76,7 +88,18 @@ STYLE_INFO: dict[str, StyleInfo] = {
         "low",
     ),
 }
-_ORDER = ["bars", "capsule", "hair", "env", "line", "stairs", "dots", "rms", "ground", "radial"]
+_ORDER = [
+    "bars",
+    "capsule",
+    "hair",
+    "env",
+    "line",
+    "stairs",
+    "dots",
+    "rms",
+    "ground",
+    "radial",
+]
 
 
 class _Canvas(QWidget):
@@ -98,13 +121,19 @@ class _Canvas(QWidget):
         if self._style not in ("radial", "ground"):
             p.setPen(QPen(QColor(t.line2), 1, Qt.PenStyle.DashLine))
             p.drawLine(
-                int(rect.left()), int(rect.center().y()), int(rect.right()), int(rect.center().y())
+                int(rect.left()),
+                int(rect.center().y()),
+                int(rect.right()),
+                int(rect.center().y()),
             )
         paint_preview(p, rect, a)
         if self._style != "radial":
             p.setPen(QPen(QColor(a.palette.playhead), 1.2))
             p.drawLine(
-                int(rect.center().x()), int(rect.top()), int(rect.center().x()), int(rect.bottom())
+                int(rect.center().x()),
+                int(rect.top()),
+                int(rect.center().x()),
+                int(rect.bottom()),
             )
         p.end()
 

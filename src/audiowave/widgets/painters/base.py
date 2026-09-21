@@ -51,7 +51,10 @@ class WavePainter(ABC):
     def played_region(self, rect: QRectF, progress: float) -> QRectF | QPainterPath:
         """The part of ``rect`` that counts as already played. Default: everything left of the playhead."""
         return QRectF(
-            rect.left(), rect.top(), rect.width() * min(max(progress, 0.0), 1.0), rect.height()
+            rect.left(),
+            rect.top(),
+            rect.width() * min(max(progress, 0.0), 1.0),
+            rect.height(),
         )
 
     @abstractmethod

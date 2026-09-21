@@ -75,7 +75,8 @@ def paint_ruler(
     text, line = QColor(palette.text), QColor(palette.grid).lighter(160)
     painter.setPen(QColor(palette.grid))
     painter.drawLine(
-        QPointF(rect.left(), rect.bottom() - 0.5), QPointF(rect.right(), rect.bottom() - 0.5)
+        QPointF(rect.left(), rect.bottom() - 0.5),
+        QPointF(rect.right(), rect.bottom() - 0.5),
     )
 
     for t, major in ticks(start, end, step):

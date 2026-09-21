@@ -6,7 +6,13 @@ from enum import Enum
 
 import numpy as np
 from PySide6.QtCore import QIODevice, QObject, Signal
-from PySide6.QtMultimedia import QAudio, QAudioDevice, QAudioFormat, QAudioSource, QMediaDevices
+from PySide6.QtMultimedia import (
+    QAudio,
+    QAudioDevice,
+    QAudioFormat,
+    QAudioSource,
+    QMediaDevices,
+)
 
 from audiowave.core.clip import AudioClip
 from audiowave.core.format import AudioFormat, SampleFormat, decode_pcm
@@ -62,7 +68,10 @@ class AudioRecorder(QObject):
         return self._frames / self._format.sample_rate if self._format else 0.0
 
     def start(
-        self, sample_rate: int = 44100, channels: int = 1, device: QAudioDevice | None = None
+        self,
+        sample_rate: int = 44100,
+        channels: int = 1,
+        device: QAudioDevice | None = None,
     ) -> bool:
         """Begin a new recording. Returns False (and emits ``errorOccurred``) if it cannot start."""
         if self._state is not RecorderState.STOPPED:
