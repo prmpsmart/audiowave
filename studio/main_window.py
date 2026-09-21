@@ -87,9 +87,9 @@ class MainWindow(QMainWindow):
     def _top_bar(self) -> QFrame:
         bar = QFrame()
         bar.setObjectName("topbar")
-        bar.setFixedHeight(48)
+        bar.setFixedHeight(52)
         row = QHBoxLayout(bar)
-        row.setContentsMargins(18, 0, 14, 0)
+        row.setContentsMargins(18, 5, 14, 5)
         row.setSpacing(18)
 
         brand = QLabel(f'Audio<i style="color:{get_theme().accent}">Wave</i>')

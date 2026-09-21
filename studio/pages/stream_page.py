@@ -143,6 +143,7 @@ class StreamPage(QWidget):
         caption.setObjectName("eyebrow")
         col.addWidget(caption)
         col.addWidget(editor)
+        col.addStretch()
         return box, editor
 
     def _lane_card(self) -> QFrame:
