@@ -18,7 +18,7 @@ measuring and editing audio, plus **AudioWave Studio**, a desktop app built only
 - **Tested:** over 200 tests, including real playback, real MP3 decoding, real TCP streaming, and every code sample in
   this README.
 
-### See it in motion
+## See it in motion
 
 ![Animated tour: from the old 0.1 UI, scrolling through every screen of AudioWave Studio](docs/media/audiowave-tour.gif)
 
@@ -73,8 +73,8 @@ window, or press <kbd>Ctrl/⌘</kbd>+<kbd>O</kbd>.
 - **Markers, zoom, follow:** press <kbd>M</kbd> to drop a marker, zoom with the slider or the wheel, and let the view follow
   the playhead. The overview strip shows the whole clip and a draggable window onto it.
 - **Per-channel** mute and solo buttons and level meters; speed from 0.5× to 2×.
-- **Silence highlights** (orange bands above) mark what *Find silences* detected.
-- **Takes** keep every recording and opened file; click one to switch. *Save WAV* and *Export PNG* are one click away.
+- **Silence highlights** (orange bands above) mark what _Find silences_ detected.
+- **Takes** keep every recording and opened file; click one to switch. _Save WAV_ and _Export PNG_ are one click away.
 
 ### MP3 and friends open like any other file
 
@@ -141,7 +141,7 @@ not use them: no dead sliders.
 ![Light theme](docs/screenshots/studio-player-light.png)
 
 Every colour comes from one theme object, so switching between dark and light (the sun/moon button, top right) restyles the
-app and the waveforms together. The inspector edits both channels together (*Linked*) or **L** and **R** separately, and can
+app and the waveforms together. The inspector edits both channels together (_Linked_) or **L** and **R** separately, and can
 save and load presets.
 
 ---
@@ -150,36 +150,36 @@ save and load presets.
 
 ### Keyboard
 
-| Key | Action |
-|-----|--------|
-| <kbd>Space</kbd> | Play / pause |
-| <kbd>M</kbd> · <kbd>L</kbd> · <kbd>R</kbd> | Add marker · toggle loop · start / stop recording |
-| <kbd>Ctrl/⌘</kbd>+<kbd>O</kbd> | Open a file |
-| <kbd>Ctrl/⌘</kbd>+<kbd>Z</kbd> · <kbd>Ctrl/⌘</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> (or <kbd>Y</kbd>) | Undo · redo |
-| <kbd>Delete</kbd> / <kbd>Backspace</kbd> · <kbd>Ctrl/⌘</kbd>+<kbd>T</kbd> | Cut the selection · trim to the selection |
-| <kbd>←</kbd> <kbd>→</kbd> (with the pointer over the waveform) | Move the playhead 1 s; with <kbd>Shift</kbd> 10 s, with <kbd>Alt</kbd> 0.1 s |
-| <kbd>Home</kbd> · <kbd>End</kbd> | Jump to the start · end |
-| <kbd>+</kbd> · <kbd>−</kbd> · <kbd>0</kbd> · <kbd>PgUp</kbd> / <kbd>PgDn</kbd> | Zoom in · zoom out · fit everything · scroll a page |
+| Key                                                                                                | Action                                                                       |
+| -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| <kbd>Space</kbd>                                                                                   | Play / pause                                                                 |
+| <kbd>M</kbd> · <kbd>L</kbd> · <kbd>R</kbd>                                                         | Add marker · toggle loop · start / stop recording                            |
+| <kbd>Ctrl/⌘</kbd>+<kbd>O</kbd>                                                                     | Open a file                                                                  |
+| <kbd>Ctrl/⌘</kbd>+<kbd>Z</kbd> · <kbd>Ctrl/⌘</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> (or <kbd>Y</kbd>) | Undo · redo                                                                  |
+| <kbd>Delete</kbd> / <kbd>Backspace</kbd> · <kbd>Ctrl/⌘</kbd>+<kbd>T</kbd>                          | Cut the selection · trim to the selection                                    |
+| <kbd>←</kbd> <kbd>→</kbd> (with the pointer over the waveform)                                     | Move the playhead 1 s; with <kbd>Shift</kbd> 10 s, with <kbd>Alt</kbd> 0.1 s |
+| <kbd>Home</kbd> · <kbd>End</kbd>                                                                   | Jump to the start · end                                                      |
+| <kbd>+</kbd> · <kbd>−</kbd> · <kbd>0</kbd> · <kbd>PgUp</kbd> / <kbd>PgDn</kbd>                     | Zoom in · zoom out · fit everything · scroll a page                          |
 
 ### Mouse
 
-| Gesture | Action |
-|---------|--------|
-| Click or drag on the waveform | Seek |
-| Drag on the ruler (or <kbd>Shift</kbd>-drag) | Select / loop a region |
-| Drag a region's edge · double-click inside it | Resize it · clear it |
-| Click a marker flag | Jump to it |
-| <kbd>Ctrl/⌘</kbd> + wheel · plain wheel | Zoom at the pointer · scroll |
-| Drag the overview window or its edges | Scroll · zoom |
-| Drop a file on the window | Open it |
+| Gesture                                       | Action                       |
+| --------------------------------------------- | ---------------------------- |
+| Click or drag on the waveform                 | Seek                         |
+| Drag on the ruler (or <kbd>Shift</kbd>-drag)  | Select / loop a region       |
+| Drag a region's edge · double-click inside it | Resize it · clear it         |
+| Click a marker flag                           | Jump to it                   |
+| <kbd>Ctrl/⌘</kbd> + wheel · plain wheel       | Zoom at the pointer · scroll |
+| Drag the overview window or its edges         | Scroll · zoom                |
+| Drop a file on the window                     | Open it                      |
 
 ### Formats
 
-| | |
-|-|-|
-| **Open** | WAV (8/16/24/32-bit PCM, 32-bit float, extensible header) directly. MP3, FLAC, Ogg, M4A/AAC, WMA through Qt's FFmpeg-based decoder. MP3 is covered by the tests; the rest depend on your Qt build. |
-| **Save** | WAV (16-bit in Studio; the library also writes 8/24/32-bit and float). MP3 export is not supported. |
-| **Stream** | 16-bit PCM over TCP, mono or stereo. |
+|            |                                                                                                                                                                                                    |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Open**   | WAV (8/16/24/32-bit PCM, 32-bit float, extensible header) directly. MP3, FLAC, Ogg, M4A/AAC, WMA through Qt's FFmpeg-based decoder. MP3 is covered by the tests; the rest depend on your Qt build. |
+| **Save**   | WAV (16-bit in Studio; the library also writes 8/24/32-bit and float). MP3 export is not supported.                                                                                                |
+| **Stream** | 16-bit PCM over TCP, mono or stereo.                                                                                                                                                               |
 
 ---
 
@@ -204,6 +204,7 @@ imports Qt.
 ### 1. Show a waveform and play it
 
 <!-- readme-test -->
+
 ```python
 from PySide6.QtWidgets import QApplication
 from audiowave import Appearance, AudioClip
@@ -234,6 +235,7 @@ version is [`examples/waveform_player.py`](examples/waveform_player.py).
 ### 2. Load, inspect, edit and save (no Qt needed)
 
 <!-- readme-test -->
+
 ```python
 from audiowave import AudioClip
 from audiowave.core import edit, measure_loudness
@@ -268,6 +270,7 @@ The editing functions are `keep`, `cut`, `remove_ranges`, `fade`, `fade_in`, `fa
 ### 3. Open MP3 and other formats
 
 <!-- readme-test -->
+
 ```python
 from PySide6.QtWidgets import QApplication
 from audiowave.audio import AudioDecoder, load_clip
@@ -292,6 +295,7 @@ slightly longer than the source because encoders pad the start and end; that is 
 ### 4. Measure: loudness, spectrum, stereo image
 
 <!-- readme-test -->
+
 ```python
 from audiowave import AudioClip
 from audiowave.core import (
@@ -334,6 +338,7 @@ so zooming a ten-minute file costs about the same as a ten-second one. You can u
 ### 5. Style the waveform
 
 <!-- readme-test -->
+
 ```python
 import json
 
@@ -374,6 +379,7 @@ colours `played`, `unplayed`, `playhead`, `background`, `grid`, `loop`, `marker`
 ### 6. Loops, markers, highlights, zoom and signals
 
 <!-- readme-test -->
+
 ```python
 from PySide6.QtWidgets import QApplication
 from audiowave import AudioClip, Loop, Marker
@@ -407,13 +413,14 @@ view.show()
 app.exec()
 ```
 
-The widgets never touch audio: they *report* what the user wants (`seekRequested`, `loopChanged`) and you decide what happens,
+The widgets never touch audio: they _report_ what the user wants (`seekRequested`, `loopChanged`) and you decide what happens,
 which is why the same view works with a player, a network stream or nothing at all. Keyboard navigation (arrows, Home/End, `+`/`-`)
 is built into every timeline view.
 
 ### 7. Spectrogram, spectrum, vectorscope: more ways to look
 
 <!-- readme-test -->
+
 ```python
 from PySide6.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QWidget
 from audiowave import AudioClip
@@ -462,6 +469,7 @@ app.exec()
 ### 8. Play without any UI
 
 <!-- readme-test -->
+
 ```python
 from PySide6.QtCore import QCoreApplication
 from audiowave import AudioClip, Loop
@@ -528,6 +536,7 @@ request_microphone(live_view, start)  # asks the OS if needed; calls back with T
 ### 10. Add your own waveform style
 
 <!-- readme-test -->
+
 ```python
 import numpy as np
 from PySide6.QtCore import QPointF
@@ -570,13 +579,13 @@ region, and caches the result, so your style never deals with playhead logic. Ov
 
 ## API at a glance
 
-| Module | Main names |
-|--------|-----------|
-| `audiowave` | `AudioClip`, `AudioFormat`, `SampleFormat`, `Appearance`, `Palette`, `Gravity`, `Loop`, `Marker`, `Peaks`, `ClipPeaks`, `LivePeaks`, `Loudness` |
-| `audiowave.core` | `read_wav`, `write_wav`, `decode_pcm`, `encode_pcm`; `measure_loudness`; `spectrogram`, `band_levels`, `stereo_xy`, `correlation`, `detect_silence`, `to_db`, `from_db`; the `edit` module |
-| `audiowave.audio` | `AudioPlayer`, `PlayerState`, `AudioRecorder`, `RecorderState`, `AudioDecoder`, `load_clip`, `decode_file`, `input_devices`, `output_devices`, `request_microphone` |
+| Module              | Main names                                                                                                                                                                                                    |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `audiowave`         | `AudioClip`, `AudioFormat`, `SampleFormat`, `Appearance`, `Palette`, `Gravity`, `Loop`, `Marker`, `Peaks`, `ClipPeaks`, `LivePeaks`, `Loudness`                                                               |
+| `audiowave.core`    | `read_wav`, `write_wav`, `decode_pcm`, `encode_pcm`; `measure_loudness`; `spectrogram`, `band_levels`, `stereo_xy`, `correlation`, `detect_silence`, `to_db`, `from_db`; the `edit` module                    |
+| `audiowave.audio`   | `AudioPlayer`, `PlayerState`, `AudioRecorder`, `RecorderState`, `AudioDecoder`, `load_clip`, `decode_file`, `input_devices`, `output_devices`, `request_microphone`                                           |
 | `audiowave.widgets` | `WaveformView`, `OverviewView`, `SpectrogramView`, `SpectrumView`, `VectorscopeView`, `LiveWaveformView`, `LevelMeter`, `Viewport`, `TimelineView`, `WavePainter`, `register`, `get_painter`, `painter_names` |
-| `audiowave.binding` | `bind_player` |
+| `audiowave.binding` | `bind_player`                                                                                                                                                                                                 |
 
 Every public function and class has a docstring; `help(audiowave.core.edit)` or your editor's hover is the fastest reference.
 [docs/architecture.md](docs/architecture.md) explains the design decisions.
@@ -587,8 +596,8 @@ Every public function and class has a docstring; `help(audiowave.core.edit)` or 
 
 - **Tested on macOS (Apple silicon).** The library is plain Python on PySide6 wheels, so Windows and Linux should work, but I
   have not run them.
-- **Microphone permission (macOS).** The first recording asks for access. If you deny it, allow it in *System Settings →
-  Privacy & Security → Microphone*. Studio and `request_microphone` report a denial instead of failing silently.
+- **Microphone permission (macOS).** The first recording asks for access. If you deny it, allow it in _System Settings →
+  Privacy & Security → Microphone_. Studio and `request_microphone` report a denial instead of failing silently.
 - **`audio device has unrecognized channel` in the terminal.** Qt's macOS backend prints this when it enumerates a device with
   many channels (aggregate or virtual devices). It is harmless.
 - **No sound / no output device.** `AudioPlayer` reports `errorOccurred("No audio output device available")`. Everything
@@ -633,28 +642,28 @@ Deeper reading: [docs/architecture.md](docs/architecture.md) (layers, rendering,
 
 The 0.1 code (still in git history) was rewritten rather than patched. Old to new:
 
-| 0.1 | Now |
-|-----|-----|
-| `AudioWave` (byte arrays, channel splitting) | `AudioClip` |
-| `AudioWaveChannel` (`minimums`/`maximums`, `sample`, `scale`) | `Peaks`, `PeakPyramid`, `ClipPeaks` |
-| `AudioWaveFormOptions` (18 mutable fields and setters) | `Appearance` + `Palette` (immutable; `with_(...)`) |
-| `AudioWaveForm`, `FixedLiveAudioWaveForm` | `WaveformView` with `set_position` |
-| `LiveAudioWaveForm`, `LiveAudioWaveFormChannel` | `LiveWaveformView` + `LivePeaks` |
+| 0.1                                                           | Now                                                                        |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `AudioWave` (byte arrays, channel splitting)                  | `AudioClip`                                                                |
+| `AudioWaveChannel` (`minimums`/`maximums`, `sample`, `scale`) | `Peaks`, `PeakPyramid`, `ClipPeaks`                                        |
+| `AudioWaveFormOptions` (18 mutable fields and setters)        | `Appearance` + `Palette` (immutable; `with_(...)`)                         |
+| `AudioWaveForm`, `FixedLiveAudioWaveForm`                     | `WaveformView` with `set_position`                                         |
+| `LiveAudioWaveForm`, `LiveAudioWaveFormChannel`               | `LiveWaveformView` + `LivePeaks`                                           |
 | `AudioWavePlayer`, `AudioWaveRecorder`, `TimedLiveAudioWave*` | `AudioPlayer`, `AudioRecorder` (signals `positionChanged`, `stateChanged`) |
-| `py_audiowave` (PyAudio) | removed; QtMultimedia is the only audio backend |
-| `mimi_wave_ui` (Tk and Qt) | Studio's Stream page (`studio/stream`); the Tk UI is gone |
+| `py_audiowave` (PyAudio)                                      | removed; QtMultimedia is the only audio backend                            |
+| `mimi_wave_ui` (Tk and Qt)                                    | Studio's Stream page (`studio/stream`); the Tk UI is gone                  |
 
 **What became of Mimi Wave.** Everything the old sender and receiver did is on the Stream page, with the same roles: the sender
 is the server.
 
-| Old control | Now |
-|-------------|-----|
-| Start Server / Stop Server, port 6000–9000 | Start server / Stop server, port limited to 6000–9000 |
-| Record / Stop Recording | The Record page, or **Stream microphone** to send it live |
-| Send Recorded | **Send current take** |
-| Server IP, Connect / Disconnect | Host, Connect / Disconnect (receiver) |
-| Play Recording | **Play recording** (adds the received audio as a take and plays it) |
-| "Frame \| Size" label | `N F \| X MB` readout and a frames table |
+| Old control                                | Now                                                                 |
+| ------------------------------------------ | ------------------------------------------------------------------- |
+| Start Server / Stop Server, port 6000–9000 | Start server / Stop server, port limited to 6000–9000               |
+| Record / Stop Recording                    | The Record page, or **Stream microphone** to send it live           |
+| Send Recorded                              | **Send current take**                                               |
+| Server IP, Connect / Disconnect            | Host, Connect / Disconnect (receiver)                               |
+| Play Recording                             | **Play recording** (adds the received audio as a take and plays it) |
+| "Frame \| Size" label                      | `N F \| X MB` readout and a frames table                            |
 
 Frames are now length-prefixed instead of separated by `<<>>` (which would split any frame whose audio happened to contain those
 bytes), so old and new versions cannot talk to each other. There are no threads: streaming runs on Qt sockets.
