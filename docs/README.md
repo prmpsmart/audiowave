@@ -7,6 +7,9 @@ docs/
 ├── screenshots/
 │   ├── studio-*.png        the real app, used by the root README (regenerate with scripts/screenshots.py)
 │   └── current-ui.png      the 0.1 demo UI, for comparison
+├── media/
+│   ├── audiowave-tour.mp4  silent video scrolling through the screenshots (scripts/make_video.py)
+│   └── audiowave-tour.gif  the same tour as a GIF, which GitHub plays inline in the README
 ├── design/
 │   ├── ui-proposal.md      the UI proposal, with a status section on what was built
 │   ├── 01..05-*.png        proposal mockups

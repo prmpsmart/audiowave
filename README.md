@@ -18,6 +18,13 @@ measuring and editing audio, plus **AudioWave Studio**, a desktop app built only
 - **Tested:** over 200 tests, including real playback, real MP3 decoding, real TCP streaming, and every code sample in
   this README.
 
+### See it in motion
+
+![Animated tour: from the old 0.1 UI, scrolling through every screen of AudioWave Studio](docs/media/audiowave-tour.gif)
+
+<sub>A 40-second scroll from the old 0.1 UI through every screen below. Silent. Full quality:
+[audiowave-tour.mp4](docs/media/audiowave-tour.mp4).</sub>
+
 ## Contents
 
 1. [Install and run](#install-and-run)
@@ -610,6 +617,7 @@ docs/              architecture, design proposal and mockups, screenshots
 pytest                                   # the whole suite, headless
 ruff check . && ruff format .            # lint and format
 python scripts/screenshots.py            # regenerate every screenshot in this README
+pip install -e ".[video]" && python scripts/make_video.py   # rebuild the tour (mp4 + gif) from those screenshots
 ```
 
 The tests cover core maths (codec round trips, loudness validated against analytic values at four sample rates), painters and

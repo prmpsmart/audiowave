@@ -13,6 +13,7 @@ authors = [{ name = "PRMPSmart", email = "prmpsmart@gmail.com" }]
 dependencies = ["numpy>=1.26", "PySide6>=6.6"]
 
 [project.optional-dependencies]
+video = ["imageio-ffmpeg>=0.5"]  # only for scripts/make_video.py
 dev = ["pytest>=8", "pytest-qt>=4.4", "ruff>=0.5", "lameenc>=1.7"]  # lameenc only builds the mp3 test fixtures
 
 [project.scripts]
